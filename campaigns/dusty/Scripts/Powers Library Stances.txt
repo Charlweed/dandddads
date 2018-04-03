@@ -1,0 +1,358 @@
+<!-- Stances: Resting
+[de.lib.TestOwnership()]
+[ThisStance = "Resting"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = "Resting"]
+[StanceToHitMelee = -2]
+[StanceToHitRange = -2]
+[StanceToHitSpell = -2]
+[StanceParry = -2]
+[StanceDodge = -2]
+[StanceWill = -2]
+[StanceFort = -2]
+[Result = "Taking  <font: color = blue><b>[Stance]</b></font> stance.<br>
+ -2 all defenses,  -2 To Hit, -2 Parry, -2 Parry DC.  If resting at start of turn, gain 1 focus and stamina."]
+-->
+[macro.return = Result]
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Arcane Guidance
+[de.lib.TestOwnership()]
+[ThisStance = "Arcane Guidance"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[StanceToHitStat = "Intelligence"]
+[Result = Result + "Use Intelligence (+" + de.lib.Mod(Intelligence) + ") for staff and dagger<br>
+(currently scripts don't check for staff or dagger being held, so don't cheat!)"]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Arcane Quarry
+[de.lib.TestOwnership()]
+[ThisStance = "Arcane Quarry"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "Choose target, if Arcane Quarry active at start of turn, +2 to hit that target (magic or not)"]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Artful Dodger
+[de.lib.TestOwnership()]
+[ThisStance = "Artful Dodger"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[StanceToHitMelee = -2]
+[StanceParry = -2]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "-2 To Hit, +" + de.lib.Mod(Dexterity) + " to defenses against Opportunity Attacks."]
+-->
+[macro.return = Result]
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Body Over Mind
+[de.lib.TestOwnership()]
+[ThisStance = "Body Over Mind"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>[Stance]</b></font> stance. (1 RAP)<br>
+If Body Over Mind active at start of turn, exchange two focus for two stamina."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Brash
+[de.lib.TestOwnership()]
+[ThisStance = "Brash"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[StanceToHitMelee = 1]
+[StanceParry = -1]
+[StanceDodge = -1]
+[StanceWill = -1]
+[StanceFort = -1]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "Melee To Hit +1, +1 Parry DC, All Defenses -1"]
+-->
+[macro.return = Result]
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Covering
+[de.lib.TestOwnership()]
+[ThisStance = "Covering"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "Pick adjacent ally. If adjacent ally is melee attacked,<br> may for <font: color = blue><b>2</b></font> focus immediate interrupt to parry at -2."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Defensive
+[de.lib.TestOwnership()]
+[ThisStance = "Defensive"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[StanceToHitMelee = -1]
+[StanceToHitRange = -1]
+[StanceToHitSpell = -1]
+[StanceParry = 1]
+[StanceDodge = 1]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "Dodge +1, Parry +1, -1 To Hit"]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Energized
+[de.lib.TestOwnership()]
+[ThisStance = "Energized"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[StanceToHitSpell = 1]
+[StanceDamageSpell = 1]
+[StanceParry = -2]
+[StanceDodge = -2]
+[StanceWill = -2]
+[StanceFort = -2]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "+1 to spell hit and damage. -2 to all defenses."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Fade
+[de.lib.TestOwnership()]
+[ThisStance = "Energized"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "-1 agro slot."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+<!-- Powers Library: Frantic
+[de.lib.TestOwnership()]
+[ThisStance = "Frantic"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "+2 to Adrenaline or Willpower surge gains. (not auto-scripted yet. Do by hand)"]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Light Aura
+[de.lib.TestOwnership()]
+[ThisStance = "Light Aura"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[h:StanceParry = -2]
+[h:StanceDodge = -2]
+[h:StanceWill = -2]
+[h:StanceFort = -2]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "All defenses -2, if Active at start of your turn, Allies (but not you) within mantle gain 2 stamina and/or focus."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Mark
+[de.lib.TestOwnership()]
+[ThisStance = "Mark"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "Opportunity To Hit on chosen adjacent enemy if it moves or attacks another."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Mind Over Body
+[de.lib.TestOwnership()]
+[ThisStance = "Mind Over Body"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "If Mind Over Body active at start of turn, exchange two stamina for two focus."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: None Shall Pass
+[de.lib.TestOwnership()]
+[ThisStance = "None Shall Pass"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "If an enemy tries to move or shift into an adjacent space, as an immediate reaction, you may shift into that space instead.<br>The lost move counts against the enemy (i.e. shift is lost or one movement point is lost).<br>Once done, the stance is removed."]
+-->
+[macro.return = Result]
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Parry Missile
+[de.lib.TestOwnership()]
+[ThisStance = "Parry Missile"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "Pick an enemy or 90 degree arc.<br>Missiles can be parried with shield at -2."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Quarry
+[de.lib.TestOwnership()]
+[ThisStance = "Quarry"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[StanceToHitStat = "Intelligence"]
+[Result = Result + "If Quarry active on target at start of turn, +2 to hit"]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Spirit Defense
+[de.lib.TestOwnership()]
+[ThisStance = "Spirit Defense"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[StanceToHitMelee = -1]
+[StanceToHitRange = -1]
+[StanceToHitSpell = -1]
+[StanceParry = 1]
+[StanceDodge = 1]
+[StanceWill = 1]
+[StanceFort = 1]
+[Result = Result + "Defenses +1, -2 To Hit"]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: GENERIC
+[de.lib.TestOwnership()]
+[ThisStance = "GENERIC"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "GENERIC TEXT"]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Dark Defense
+[de.lib.TestOwnership()]
+[ThisStance = "Dark Defense"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[StanceToHitMelee = -2]
+[StanceToHitRange = -2]
+[StanceToHitSpell = -2]
+[StanceParry = 2]
+[StanceDodge = 2]
+[Result = Result + "Parry and Dodge +2, To Hit -2, Armor all locations +1"]
+-->
+[macro.return = Result]

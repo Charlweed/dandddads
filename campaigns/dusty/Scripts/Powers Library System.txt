@@ -1,0 +1,26 @@
+<!-- Powers Library: onCampaignLoad -->
+[H: '<!-- All functions will be given a UDF name excluding tags and special characters -->']
+[defineFunction("pause", "pause@this", 1, 0 ) ] 
+[H: prefix = "po.lib."]
+[H: this = getMacroLocation()]
+
+[H: '<!-- Macro names ending with .html will allow output. "local" also sets newScope to 0. -->']
+[H: outputExtensions = json.append("","html","local","out","output","sub","css")]
+
+[H: '<!-- Define functions here with options other than ignoreOutput = 1 and NewScope = 1 -->']
+
+[H: '<!-- List functions names here to exclude from UDF definition -->']
+[H: excludeList = json.append("","(new)")]
+[H: tableFunctions = json.difference(getMacros("json"),excludeList)]
+
+[H: '<!-- Define UDFs.  Already defined UDFs will not be redefined. -->']
+[H, foreach(fn,tableFunctions), code: {
+   [H: fName = replace(fn,"<[^>]*?>","")]
+   [H: fName = replace(fName,"[^a-zA-Z0-9_.]","")]
+   [H: cleanFN = strformat("%{prefix}%{fName}")]
+   [H: extension = listGet(cleanFN,listCount(cleanFN,".")-1,".")]
+   [H: newScope = 1 - listContains("local,sub",extension)]
+   [H: ignoreOutput = 1 - json.contains(outputExtensions,extension)]
+   [H: exclude = listContains("x",extension)]
+   [H, if(! isFunctionDefined(cleanFN) && ! exclude): defineFunction(cleanFN,strformat("%{fn}@"+this),ignoreOutput,newScope)]
+}]

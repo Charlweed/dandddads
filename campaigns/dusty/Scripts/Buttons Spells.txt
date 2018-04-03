@@ -1,0 +1,113 @@
+
+<!-- Spell Tinker
+[Roll = 1d100]
+[Result = "<font color=red size=+2><b>Chaos!!!</b></font><br>Fizzle and roll on Chaos table."]
+[Result = if (Roll >= 4, "<font color=red size=+1><b>Critical Failure!</b></font><br>Fizzle and roll on Critical Failure table.", Result)]
+[Result = if (Roll >= 8, "<font color=red><b>Fizzle</b></font><br>Spell fails, though cost is spent.", Result)]
+[Result = if (Roll >= 12, "<font color=red><b>Large Flaw</b></font><br>Roll on large flaw table.", Result)]
+[Result = if (Roll >= 18, "<font color=red><b>Slow Cast</b></font><br>Cost extra RAP. If not enough RAP, spell fizzles.", Result)]
+[Result = if (Roll >= 25, "<font color=red><b>Small Flaw</b></font><br>Roll on Small Flaw table.", Result)]
+[Result = if (Roll >= 65, "Normal<br>", Result)]
+[Result = if (Roll >= 77, "<font color=green><b>Small Boon</b></font><br>Roll on Small Boon table.", Result)]
+[Result = if (Roll >= 85, "<font color=green><b>Quick Cast</b></font><br>Cost 1 less RAP.", Result)]
+[Result = if (Roll >= 91, "<font color=green><b>Large Boon</b></font><br>Roll on Large Boon table.", Result)]
+[Result = if (Roll >= 96, "<font color=green><b>Critical Success!</b></font><br>Automatically hits and has maximum effect.", Result)]
+[Result = if (Roll >= 99, "<font color=green size=+1><b>Inspiration!</b></font><br>Critical success and gain Daily AP.", Result)]
+[Result = if (Roll >= 100, "<font color=green size=+2><b>Eureka!</b></font><br>Spell gets a small permanent upgrade.", Result)]
+-->
+[r:Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Charge Staff Wand
+[de.lib.TestOwnership()]
+-->
+<b>Charge Staff or Wand</b>:<br>
++2 Stam and +4 Focus to be used until the end of day.<br>
+<font color=red size=+1><b>NOT SCRIPTED YET! Need to track by hand.</b></font>
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+<!-- Lesser Fay Quickening
+[de.lib.TestOwnership()]
+[de.lib.ExpendRAP(1,0)]
+[assert(macro.return == "Success", macro.return)]
+-->
+<b>Lesser Fay Quickening</b>:<br>
+[h: Result = de.lib.ExpendStat("Focus", 1, 0)]
+[if (Result == ""), code: {
+    <!-- Not enough focus -->
+    [r: Result]
+};
+{
+    <!-- Success -->
+    [h: de.lib.ExpendStat("Focus", 1, 1)]
+    [h:de.lib.ExpendRAP(1,1)]
+    (Foc:1, RAP:1) Seen target within mantle gains one RAP and may take an immediate action.
+}]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Luck of the Fey
+[de.lib.TestOwnership()]
+[de.lib.ExpendRAP(1,0)]
+[assert(macro.return == "Success", macro.return)]
+-->
+<b>Luck of the Fey</b>:<br>
+[h: Result = de.lib.ExpendSpellAP(0)]
+[if (Result == "Success"), code: {
+    <!-- Enough AP -->
+    [h: Result = de.lib.ExpendStat("Focus", 1, 0)]
+    
+    [if (Result == "Success"), code: {
+        <!-- Success -->
+        [h: de.lib.ExpendSpellAP(1)]
+        [h: de.lib.ExpendRAP(1,1)]
+        [h: de.lib.ExpendStat("Focus", 1, 1)]
+        (Foc:1, RAP:1, AP:1) Target that can be seen (or self) gets advantage on a roll during their next turn (or this turn for self)
+    };
+    {
+        <!-- Not enough focus -->
+        [r: Result]
+    }]
+};
+{
+    <!-- Not enough focus -->
+    [r: Result]
+}]
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Minor Tricksters Mind Shock
+[de.lib.TestOwnership()]
+[de.lib.ExpendRAP(1,0)]
+[assert(macro.return == "Success", macro.return)]
+-->
+<b>Minor Tricksters Mind Shock</b>:<br>
+[h: Result = de.lib.ExpendStat("Stamina", 1, 0)]
+[if (Result == "Success"), code: {
+    <!-- Enough Stamina -->
+    [h: Result = de.lib.ExpendStat("Focus", 4, 0)]
+    [if (Result == "Success"), code: {
+        <!-- Success -->
+        [h: de.lib.ExpendRAP(1,1)]
+        [h: de.lib.ExpendStat("Stamina", 1, 1)]
+        [h: de.lib.ExpendStat("Focus", 4, 1)]
+        [h: Roll = 2d10]
+        [h: StatBonus = de.lib.Mod(Intelligence)]
+        [h: AttackRoll = Roll + SkillMind + StatBonus]
+        [h: Result = "Attack: <font size=+2 color=green><b>" + AttackRoll + "</b></font> vs <font size=+2 color=blue>WIL</font></b><br>"]
+        [h: Result = Result + "(Roll:" + Roll + ", Mind:" + SkillMind + ", Int:" + StatBonus + ")<br>"]
+        [h: Result = Result + "(Stam:1, Foc:4) On success, target is confused. DC 10 INT Save to recover."]
+    };
+    {
+        <!-- Not enough stamina -->
+    }]
+};
+{
+    <!-- Not enough focus -->
+}]
+[r: Result]

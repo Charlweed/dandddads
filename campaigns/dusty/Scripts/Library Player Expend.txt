@@ -1,0 +1,90 @@
+
+<!-- Library: ExpendRAP
+[Amount = arg(0)]
+[Apply = arg(1)]
+[if(Amount > CurRoundAP), code:
+{
+    [Output = "<font color=red><b>" + Amount + " Round AP are needed, but only " + CurRoundAP + " are available.</b></font>"
+    ".<br>"]
+};
+{
+    [if(Apply == 1), code:
+    {
+        [CurRoundAP = CurRoundAP - Amount]
+    };{}]
+    [Output = "Success"]
+}]
+[macro.return = Output]
+-->
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: ExpendStat
+[Stat = arg(0)]
+[Amount = arg(1)]
+[Apply = arg(2)]
+[Command = "Cur" + Stat]
+[CurStat = eval(Command)]
+[Command = "Temp" + Stat]
+[TempStat = eval(Command)]
+[if(Amount > (CurStat + TempStat)), code:
+{
+    [Output = Amount +" " + Stat + " is needed, but only "+  (CurStat + TempStat) + " is available."
+    ".<br>"]
+};
+{
+    [if(Apply == 1), code:
+    {
+        [AfterTemp = max(Amount - TempStat, 0)]
+        [TempStat = TempStat - Amount + AfterTemp]
+        [Command = "Temp"+Stat+"= TempStat"]
+        [eval(Command)]
+        [CurStat = CurStat - AfterTemp]
+        [Command = "Cur"+Stat+"= CurStat"]
+        [eval(Command)]
+    };{}]
+    [Output = "Success"]
+}]
+[macro.return = Output]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: ExpendRAP
+[Amount = arg(0)]
+[Apply = arg(1)]
+[if(Amount > CurRoundAP), code:
+{
+    [Output = "<font color=red><b>" + Amount + " Round AP are needed, but only " + CurRoundAP + " are available.</b></font>"
+    ".<br>"]
+};
+{
+    [if(Apply == 1), code:
+    {
+        [CurRoundAP = CurRoundAP - Amount]
+    };{}]
+    [Output = "Success"]
+}]
+[macro.return = Output]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: ExpendSpellAP
+[Amount = arg(0)]
+[Apply = arg(1)]
+[Avail = CurSpellAP + CurAP]
+[if(Avail <= 0), code:
+{
+    [Output = "<font color=red><b>" + Amount + " Spell or Daily AP are needed, but only " + Avail + " are available.</b></font>"
+    ".<br>"]
+};
+{
+    [if(Apply == 1), code:
+    {
+        [CurAP = if (CurSpellAP > 0, CurAP, CurAP - 1)]
+        [CurSpellAP = if (CurSpellAP > 0, CurSpellAP - 1, 0)]
+    };{}]
+    [Output = "Success"]
+}]
+[macro.return = Output]
+ -->
