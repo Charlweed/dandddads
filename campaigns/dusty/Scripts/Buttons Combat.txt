@@ -1,0 +1,46 @@
+<!-- Roll Initiative
+[de.lib.TestOwnership()]
+[InitRoll=2d10]
+[CurRoundAP = MaxRoundAP]
+ --> 
+[de.lib.SetInitiative(InitRoll, InitBonus)]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Next Initiative
+[AssertMessage = "<font color=red><b>" + getPlayerName() + " does not own the current character.</b></font>"]
+[assert(isGM() || (isOwner() && (currentToken() == getInitiativeToken())), AssertMessage)]
+[switchToken(getInitiativeToken())]
+[de.lib.LoseInitiative()]
+-->
+[getName(getInitiativeToken())] finishes round.<br>
+[h:nextInitiative()]
+[h:switchToken(getInitiativeToken())]
+Round starts for:
+[de.lib.ReceiveInitiative()]
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Shift
+[de.lib.TestOwnership()]
+[de.lib.ExpendRAP(1,0)]
+[assert(macro.return == "Success", macro.return)]
+[de.lib.ExpendRAP(1,1)]
+-->
+<b>Shift</b>: Move to an adjacent square. 1 RAP spent ([CurRoundAP] RAP remaining)<br>
+No Opportunity Attack if shifting orthogonal.
+Acrobatics vs Opponent Attack for no OA when shifting diagonal.
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Shift
+[de.lib.TestOwnership()]
+[de.lib.ExpendRAP(3,0)]
+[assert(macro.return == "Success", macro.return)]
+[de.lib.ExpendRAP(3,1)]
+-->
+<b>Move</b>: Move up to [Move] squares. 3 RAP spent ([CurRoundAP] RAP remaining)
+
+------------------------------------------------------------------------------------------------------------------------
+

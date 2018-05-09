@@ -1,0 +1,57 @@
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- VerifyRequirements
+[de.lib.TestOwnership()]
+[StaminaCost = arg(0)]
+[FocusCost = arg(1)]
+[RAPCost = arg(2)]
+[DAPCost = arg(3)]
+[SAPCost = arg(4)]
+[Result = ""]
+
+-- Check for requirements -->
+[if (DAPCost > 0), code: {
+    [Result = de.lib.ExpendDAP(DAPCost,0)]
+    [assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+}]
+[if (SAPCost > 0), code: {
+    [Result = de.lib.ExpendSpellAP(SAPCost,0)]
+    [assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+}]
+[Result = de.lib.ExpendRAP(RAPCost,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[Result = de.lib.ExpendStat("Focus", FocusCost, 0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[Result = de.lib.ExpendStat("Stamina", StaminaCost, 0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+
+-- Success, spend requirements --
+[if (DAPCost > 0), code: {
+    [Result = de.lib.ExpendDAP(DAPCost,1)]
+}]
+[if (SAPCost > 0), code: {
+    [Result = de.lib.ExpendSpellAP(SAPCost,1)]
+}]
+[de.lib.ExpendStat("Focus", FocusCost, 1)]
+[de.lib.ExpendStat("Stamina", StaminaCost, 1)]
+[de.lib.ExpendRAP(RAPCost,1)]
+
+-- Output --
+[Result = "("]
+[if (StaminaCost > 0), code: {
+    [Result = Result + "Sta:" + StaminaCost + ", "]
+}]
+[if (FocusCost > 0), code: {
+    [Result = Result + "Foc:" + FocusCost + ", "]
+}]
+[Result = Result + "RAP:" + RAPCost]]
+[if (DAPCost > 0), code: {
+    [Result = Result + ", DAP:" + DAPCost]
+}]
+[if (SAPCost > 0), code: {
+    [Result = Result + ", Spell AP:" + SAPCost]
+}]
+[Result = Result + ")"]
+-->
+[macro.return = Result]

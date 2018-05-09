@@ -1,0 +1,33 @@
+<!-- Library: Show Handout
+-->
+[dialog("Dialog Test"): {
+  <html>
+    <head>
+      <title>[r:getName()]</title>
+    </head>
+    <body>
+        <img src='[r:getTokenHandout()]'></img>
+    </body>
+  </html>  
+}]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Show Handout
+-->
+[getPlayerName()] showing handout.
+[de.lib.ShowHandout()]
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+[Skill = "SkillElemental"]
+[Skill] is [de.lib.LookupMagicSkill("SkillElemental")]<br>
+------------------------------------------------------------------------------------------------------------------------
+
+.oddRow { background-color: #FFFFFF }
+.evenRow { background-color: #EEEEAA }
+#stats th { background-color: #113311; color: #FFFFFF }

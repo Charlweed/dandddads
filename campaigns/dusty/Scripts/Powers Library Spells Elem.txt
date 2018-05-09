@@ -1,0 +1,140 @@
+<!-- Powers Library: MadToddsFireballMinor
+[CostString = po.lib.VerifyRequirements(3,6,5,0,1)]
+
+-- Perform Power
+[FireToHit = de.lib.GetExtraProp("FireToHit")]
+[FireToHit = if(FireToHit == "", 0, FireToHit)]
+[FireDamage = de.lib.GetExtraProp("FireDamage")]
+[FireDamage = if(FireDamage == "", 0, FireDamage)]
+[AttackRoll = 2d10]
+[SkillVal = de.lib.LookupMagicSkill("SkillElemental")]
+[Attack = AttackRoll + SkillVal + StanceToHitSpell + FireToHit]
+[DamageRoll = 2d6]
+[Damage = DamageRoll + SkillVal + StanceDamageSpell + FireDamage]
+        
+-- Output --
+[Result = "<b>Mad Todd's Minor Fireball</b>:" + CostString]
+[Result = Result + "<br>Attack: <font size=+2 color=green><b>" + Attack + "</b></font> vs <font size=+2 color=blue>Dodge</font></b><br>"]
+[Result = Result + "(Roll:" + AttackRoll + ", Elem:" + SkillVal]
+[if (FireToHit != 0), code: {
+    [Result = Result + ", Fire:" + FireToHit]
+}]
+[if (StanceToHitSpell != 0), code: {
+    [Result = Result + ", Stance:" + StanceToHitSpell]
+}]
+[Result = Result + ")<br>"]
+[Result = Result + "Damage: <font size=+2 color=red><b>" + Damage + "</b></font>"]
+[Result = Result + "<br>(Roll:" + DamageRoll + ", Elem:" + SkillVal]
+[if (FireDamage != 0), code: {
+    [Result = Result + ", Fire:" + FireDamage]
+}]
+[if (StanceDamageSpell != 0), code: {
+    [Result = Result + ", Stance:" + StanceDamageSpell]
+}]
+[Result = Result + ")<br>"]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: JestersSmokeBombMinorEnemy
+[CostString = po.lib.VerifyRequirements(1,3,5,0,0)]
+
+-- Perform Power
+        
+-- Output --
+[Result = "<b>Jester's Minor Smoke Bomb on enemy square</b>:" + CostString]
+[Result = Result + "<br>Creates a cloud of smoke in a square for 3 rounds that offers partial concealment (can enter stealth, -2 to hit in and out).<br>Un-suspecting creatures in cloud must make DC <font color=blue><b>12 INT</b></font> save or be confused (DC 8 INT save).<br>Targets get +2 cummulative INT save on subsequent attacks."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: JestersSmokeBombMinorAlly
+[CostString = po.lib.VerifyRequirements(1,3,1,0,0)]
+
+-- Perform Power
+        
+-- Output --
+[Result = "<b>Jester's Minor Smoke Bomb on non-enemy square</b>:" + CostString]
+[Result = Result + "<br>Creates a cloud of smoke in a square for 3 rounds that offers partial concealment (can enter stealth, -2 to hit in and out).<br>Un-suspecting creatures in cloud must make DC <font color=blue><b>12 INT</b></font> save or be confused (DC 8 INT save).<br>Targets get +2 cummulative INT save on subsequent attacks."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: JestersFlashBombMinor
+[CostString = po.lib.VerifyRequirements(2,4,5,0,1)]
+
+-- Perform Power
+        
+-- Output --
+[Result = "<b>Jester's Minor Flash Bomb</b>:" + CostString]
+[Result = Result + "<br>Creates a flash and cloud of smoke in a square for 3 rounds that offers partial concealment (can enter stealth, -2 to hit in and out).<br>Un-suspecting creatures in cloud must make DC <font color=blue><b>14 INT</b></font> save or be <b>blinded</b> for one turn and confused (DC 8 INT save).<br>Targets get +2 cummulative INT save on subsequent attacks."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: MadToddsBegginingMinor
+[CostString = po.lib.VerifyRequirements(2,4,5,0,0)]
+
+-- Perform Power
+[FireToHit = de.lib.GetExtraProp("FireToHit")]
+[FireToHit = if(FireToHit == "", 0, FireToHit)]
+[FireDamage = de.lib.GetExtraProp("FireDamage")]
+[FireDamage = if(FireDamage == "", 0, FireDamage)]
+[AttackRoll = 2d10]
+[SkillVal = de.lib.LookupMagicSkill("SkillElemental")]
+[Attack = AttackRoll + SkillVal + StanceToHitSpell + FireToHit]
+[DamageRoll = 1d4]
+[Damage = DamageRoll + SkillVal + StanceDamageSpell + FireDamage - 2]
+        
+-- Output --
+[Result = "<b>Mad Todd's Minor Beggining</b>:" + CostString]
+[Result = Result + "<br>Attack: <font size=+2 color=green><b>" + Attack + "</b></font> vs <font size=+2 color=blue>Dodge</font></b><br>"]
+[Result = Result + "(Roll:" + AttackRoll + ", Elem:" + SkillVal]
+[if (FireToHit != 0), code: {
+    [Result = Result + ", Fire:" + FireToHit]
+}]
+[if (StanceToHitSpell != 0), code: {
+    [Result = Result + ", Stance:" + StanceToHitSpell]
+}]
+[Result = Result + ")<br>"]
+[Result = Result + "Damage: <font size=+2 color=red><b>" + Damage + "</b></font>"]
+[Result = Result + "<br>(Roll:" + DamageRoll + ", Elem:" + SkillVal]
+[if (FireDamage != 0), code: {
+    [Result = Result + ", Fire:" + FireDamage]
+}]
+[if (StanceDamageSpell != 0), code: {
+    [Result = Result + ", Stance:" + StanceDamageSpell]
+}]
+[Result = Result + ")<br>"]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: LivingRopeOfZenwig
+[CostString = po.lib.VerifyRequirements(2,4,4,0,0)]
+
+-- Perform Power
+        
+-- Output --
+[Result = "<b>Living Rope of Zenwig</b>:" + CostString]
+[Result = Result + "<br>While one end of a rope, cord, or light chain remains in the casters hand,<br>the caster can slowly levitate and move the other end up to mantle distance away for up to 10 seconds with enough dexterity to slowly tie a knot."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: MishchellicksTelekinesisMinor
+[CostString = po.lib.VerifyRequirements(2,3,1,0,0)]
+
+-- Perform Power
+        
+-- Output --
+[Result = "<b>Mish'chellick's Minor Telekinesis</b>:" + CostString]
+[Result = Result + "<br>A small object (key, stone, ring, coin, etc) can be moved within the mantle space at a slow speed for 10 seconds.<br>Object must be seen at all times."]
+-->
+[macro.return = Result]
