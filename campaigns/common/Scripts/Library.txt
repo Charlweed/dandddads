@@ -1,0 +1,86 @@
+<!-- Library: ShowCharacter
+-->
+[h: propNames = "Strength, Dexterity, Constitution, Intelligence, Wisdom, Charisma"]
+[h: magicNames = "SkillMusic, SkillCommand, SkillHoly, SkillUnholy, SkillElemental, SkillBlack, SkillWhite, SkillMind, SkillPlanes"]
+[dialog("CharSheet"): {
+  <html>
+    <head>
+      <link rel="stylesheet" type="text/css" href="CharSheet_css@[r: getMacroLocation()]">
+      <title>[r:token.name] Character Sheet</title>
+    </head>
+    <body>
+      <table id="stats">
+        <tr>
+          <th>Statistic</th>
+          <th>Value</th>
+        </tr>
+        [h: class = "oddRow"]
+        [foreach(prop, propNames, ""), code: {
+          <tr class="[r:class]">
+            <td>[r: prop]</td>
+            <td>[r: getProperty(prop)]</td>
+          </tr>
+          [h: class = if(class=="oddRow", "evenRow", "oddRow")]
+        }]
+      </table>
+      <br>
+      <table id="stats">
+        <tr>
+          <th>Skill</th>
+          <th>Value</th>
+        </tr>
+        [h: class = "oddRow"]
+        [foreach(magic, magicNames, ""), code: {
+              <tr class="[r:class]">
+                <td>[r: magic]</td>
+                <td>[r: de.lib.LookupMagicSkill(magic)]</td>
+              </tr>
+              [h: class = if(class=="oddRow", "evenRow", "oddRow")]
+        }]
+      </table>
+      <br>Extra Properties:<br>
+      [foreach(Property,Extras, ""), code:
+      {
+          [h:PropertyValue = json.get(Extras,Property)]
+          ["&nbsp;&nbsp;" + Property + ":&nbsp;" + PropertyValue + "<br>"]
+      }]     
+      <br>Notes:<br>
+      [getNotes()]
+    </body>
+  </html>
+}]
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Library: EditNotes
+[r, dialog("Edit Notes"): {
+    <html>
+     <head>
+      <title>Edit Notes</title>
+     </head>
+     <body>
+         <form name="DoIt" method="json" action='[r:macroLinkText("TextAreaSet@this", "self")]'>
+              <textarea name="NotesField" rows="10" cols="100">[r:getNotes()]</textarea>
+               <br><br>
+              <input type="submit" name="nameToken" value='Update [r:getName()]'> </input>
+              <input type="reset" value="Undo Changes"> </input><br>
+              <input type="hidden" name="TokenId" value='[r:currentToken()]'>
+         </form>
+     </body>
+</html>
+}]
+[Test = currentToken()]
+
+[abort(0)]
+ -->
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: TextAreaSet
+[output = json.get(macro.args,"NotesField")]
+[myName = json.get(macro.args,"nameToken")]
+[TokenId = json.get(macro.args,"TokenId")]
+[myName = replace(myName,"Update ","")]
+[switchtoken(TokenId)]
+[setNotes(output)]
+[closeDialog("Edit Notes")]
+[abort(0)]
+ -->

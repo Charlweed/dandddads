@@ -1,0 +1,125 @@
+
+------------------------------------------------------------------------------------------------------------------------
+NOT USED YET???
+<!-- ExpendRoundAP
+[Amount = arg(0)]
+[Apply = arg(1)]
+[if(Amount > CurRoundAP, code:
+{
+    [Output = Amount +" Round AP is needed, but only "+  CurRoundAP + " APs are available."
+    ".<br>"]
+};
+{
+    [if(Apply == 1), code:
+    {
+        [CurRoundAP = CurRoundAP - Amount]
+    };{}]
+    [Output = "Success"]
+}]
+[macro.return = Output]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Expend
+[de.lib.TestOwnership()]
+[abort(input(
+    "junk|<html><b>Enter Stat Amounts Spent:</b></html>|-|LABEL|SPAN=TRUE",
+    "StaminaSpent|0|Stamina ("+CurStamina+"/"+TempStamina+") To Expend",
+    "FocusSpent|0|Focus ("+CurFocus+"/"+TempFocus+") To Expend",
+    "FatigueSpent|0|Fatigue ("+CurFatigue+"/"+TempFatigue+") To Expend",
+    "AuraSpent|0|Aura ("+CurAura+"/"+TempAura+") To Expend",
+    "RAPSpent|0|Round AP ("+CurRoundAP+") To Expend"
+))]
+[de.lib.ExpendStat("Stamina", StaminaSpent, 1)]
+[Result = macro.return]
+[Output2 = ""]
+[if (Result == "Success"), code:
+{
+    [if (StaminaSpent > 0), code:
+    {
+      [Output2 = Output2 + "spends " + StaminaSpent + " Stamina leaving " + CurStamina + " (" + TempStamina + " temp)<br>"]
+    }]
+};
+{
+    [Output2 = Output2 + "<font color=red><b>Not enough Stamina.</b></font> Use an Adrenaline Surge.<br>"]
+}]
+[de.lib.ExpendStat("Focus", FocusSpent, 1)]
+[Result = macro.return]
+[if (Result == "Success"), code:
+{
+    [if (FocusSpent > 0), code:
+    {
+        [Output2 = Output2 + "spends " + FocusSpent + " Focus leaving " + CurFocus + " (" + TempFocus + " temp)<br>"]
+    }]
+};
+{
+    [Output2 = Output2 + "<font color=red><b>Not enough Focus.</b></font> Use an Willpower Surge.<br>"]
+}]
+[ExtraFatigue = if (FatigueSpent > CurFatigue + TempFatigue, FatigueSpent - CurFatigue - TempFatigue, 0)]
+[FatigueSpent2 = FatigueSpent - ExtraFatigue]
+[de.lib.ExpendStat("Fatigue", FatigueSpent2, 1)]
+[if (FatigueSpent > 0), code:
+{
+    [Output2 = Output2 + "spends " + FatigueSpent2 + " Fatigue leaving " + CurFatigue + " (" + TempFatigue + " temp)<br>"]
+}]
+[if (ExtraFatigue > 0), code:
+{
+  [Output2 = Output2 + "<font color=red><b>extra <font size=+2>" + ExtraFatigue + "</font> Fatigue left over.<br>If this was damage, need to spend Aura or Life.</b></font><br>"]
+}]
+[ExtraAura = if (AuraSpent > CurAura + TempAura, AuraSpent - CurAura - TempAura, 0)]
+[AuraSpent2 = AuraSpent - ExtraAura]
+[de.lib.ExpendStat("Aura", AuraSpent2, 1)]
+[if (AuraSpent > 0), code:
+{
+    [Output2 = Output2 + "spends " + AuraSpent2 + " Aura leaving " + CurAura + " (" + TempAura + " temp)<br>"]
+}]
+[if (ExtraAura > 0), code:
+{
+  [Output2 = Output2 + "<font color=red><b>extra <font size=+2>" + ExtraAura + "</font> Aura left over.<br>If this was damage, need to spend Fatigue or Life.</b></font><br>"]
+}]
+
+[de.lib.ExpendRAP(RAPSpent, 1)]
+[if (Result == "Success"), code:
+{
+    [if (RAPSpent > 0), code:
+    {
+      [Output2 = Output2 + "spends " + RAPSpent + " RAP leaving " + CurRoundAP + "<br>"]
+    }]
+};
+{
+    [Output2 = Output2 + "<font color=red><b>Not enough RAP.</b></font><br>"]
+}]
+-->
+[r:Output2]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Surge: Action
+[de.lib.TestOwnership()]
+[if(CurAP > 0), code:
+{
+    [CurAP = CurAP - 1]
+    [CurRoundAP = CurRoundAP + 2]
+    [Output = "Action Surge: Two RAPs gained. (only once per round). DAP:" + CurAP + ", RAP:" + CurRoundAP]
+};
+{
+  [Output = "<font color=red><b>No Daily AP left for an Action Surge.</b></font>"]
+}]
+-->
+[r:Output]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Spend Hero Point
+[de.lib.TestOwnership()]
+[if(HeroPoints > 0), code:
+{
+    [HeroPoints = HeroPoints - 1]
+    [Output = "You've had a vision of a potential future... Hero Point Spent! Current:" + HeroPoints]
+};
+{
+  [Output = "<font color=red><b>No Hero Points left to spend!</b></font>"]
+}]
+-->
+[r:Output]

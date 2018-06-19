@@ -1,0 +1,29 @@
+<!-- Lesser Fay Quickening
+[CostString = po.lib.VerifyRequirements(1,2,1,0,0)]
+
+-- Perform Power
+
+-- Output --
+[Result = "<b>Lesser Fey Quickening</b>:" + CostString + "<br>Seen target within mantle gains one RAP and may take an immediate action."]
+
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Luck of the Fay
+[CostString = po.lib.VerifyRequirements(1,2,1,0,1)]
+
+-- Perform Power
+
+-- Output --
+[Result = "<b>Luck of the Fay</b>:" + CostString + "<br>Target that can be seen (or self) gets advantage.<br>Can be done as a reaction after first roll fails."]
+
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+

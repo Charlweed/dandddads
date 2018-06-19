@@ -1,0 +1,120 @@
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: SoulCircleMinor Ritual
+[CostString = po.lib.VerifyRequirements(0,0,0,0,1)]
+
+-- Perform Power
+[SkillVal = de.lib.LookupMagicSkill("SkillHoly")]
+[CharismaMod = de.lib.Mod(Charisma)]
+[Roll = 1d3]
+[Heal = Roll + SkillVal + CharismaMod - 2]
+
+-- Output --
+[Result = "<b>Minor Soul Circle</b>:" + CostString + "<br>Restore <font color=green size=+2><b>" + Heal + "</b></font> Fatigue and/or Aura to self and up to <font color=blue>5</font> allies. Can't go above max.<br>(Roll:" + Roll + ", Holy:" + SkillVal + ", Charisma:" + CharismaMod + ", - 2)"]
+
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: TianasComfortMinor
+[de.lib.TestOwnership()]
+[StaminaCost = 2]
+[FocusCost = 2]
+[RAPCost = 1]
+[DAPCost = 0]
+[SAPCost = 0]
+[Result = ""]
+
+-- Check for requirements -->
+[if (DAPCost > 0), code: {
+    [Result = de.lib.ExpendDAP(DAPCost,0)]
+    [assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+}]
+[if (SAPCost > 0), code: {
+    [Result = de.lib.ExpendSpellAP(SAPCost,0)]
+    [assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+}]
+[Result = de.lib.ExpendRAP(RAPCost,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[Result = de.lib.ExpendStat("Focus", FocusCost, 0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[Result = de.lib.ExpendStat("Stamina", StaminaCost, 0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+
+-- Success, spend requirements --
+[if (DAPCost > 0), code: {
+    [Result = de.lib.ExpendDAP(DAPCost,1)]
+}]
+[if (SAPCost > 0), code: {
+    [Result = de.lib.ExpendSpellAP(SAPCost,1)]
+}]
+[de.lib.ExpendStat("Focus", FocusCost, 1)]
+[de.lib.ExpendStat("Stamina", StaminaCost, 1)]
+[de.lib.ExpendRAP(RAPCost,1)]
+
+-- Perform Power
+
+
+-- Output --
+[Result = "<b>Minor Tiana's Comfort</b>:"]
+[Result = Result + "(Sta:" + StaminaCost + ", Foc:" + FocusCost + ", RAP:" + RAPCost]
+[if (DAPCost > 0), code: {
+    [Result = Result + ", DAP:" + DAPCost]
+}]
+[if (SAPCost > 0), code: {
+    [Result = Result + ", Spell AP:" + SAPCost]
+}]
+[Result = Result + ")<br> Target gets to ignore up to -2 caused by loss of life till start of caster's next turn.<br>Target can make an immediate save against most conditions."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: TianasComfortMinor
+[CostString = po.lib.VerifyRequirements(2,2,1,0,0)]
+
+-- Perform Power
+
+-- Output --
+[Result = "<b>Minor Tiana's Comfort</b>:" + CostString + "<br>Target gets to ignore up to -2 caused by loss of life till start of caster's next turn.<br>Target can make an immediate save against most conditions."]
+
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: CalmAnimalMinor
+[de.lib.TestOwnership()]
+[CostString = po.lib.VerifyRequirements(1,3,4,0,0)]
+
+-- Perform Power
+[SkillVal = de.lib.LookupMagicSkill("SkillHoly")]
+[Roll = 2d10]
+[Attack = Roll + SkillVal + StanceToHitSpell - 2 ]
+
+-- Output --
+[Result = "<b>Minor Calm Animal</b>:" + CostString]
+[Result = Result + ")<br>Target one creature of animal intelligence. <font color=green size=+2><b>" + Attack + "</b></font> vs WIL.<br>(Roll:" + Roll + ", Holy:" + SkillVal]
+[if (StanceToHitSpell != 0), code: {
+    [Result = Result + ", Stance:" + StanceToHitSpell]
+}]
+[Result = Result + ", - 2)<br>On success animal will calm down and treat the caster and allies as friendly within its nature. <br> It will remember attacks against it and would immediately return to hostile."]
+
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: CallAnimalFriend
+[de.lib.TestOwnership()]
+[CostString = po.lib.VerifyRequirements(1,4,1,0,0)]
+
+-- Perform Power
+
+-- Output --
+[Result = "<b>Call Animal Friend (active)</b>:" + CostString]
+[Result = Result + "<br>Telepathically call out to a creature of animal intelligence within mantle miles."]
+-->
+[macro.return = Result]

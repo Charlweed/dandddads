@@ -1,0 +1,24 @@
+
+<!-- Minor Tricksters Mind Shock
+[CostString = po.lib.VerifyRequirements(3,6,5,0,0)]
+
+-- Perform Power
+[Roll = 2d10]
+[SkillVal = de.lib.LookupMagicSkill("SkillWhite")]
+[AttackRoll = Roll + SkillVal + StanceToHitSpell - 2 ]
+
+        
+-- Output --
+[Result = "<b>Minor Tricksters Mind Shock</b>:" + CostString]
+[Result = Result + "<br>Attack: <font size=+2 color=green><b>" + AttackRoll + "</b></font> vs <font size=+2 color=blue>WIL</font></b><br>"]
+[Result = Result + "(Roll:" + Roll + ", White:" + SkillVal]
+[if (StanceToHitSpell != 0), code: {
+    [Result = Result + ", Stance:" + StanceToHitSpell]
+}]
+[Result = Result + ", -2)<br>"]
+[Result = Result + "On success, target is confused. DC 10 INT Save to recover."]
+
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------

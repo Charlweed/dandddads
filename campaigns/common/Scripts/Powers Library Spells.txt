@@ -1,0 +1,101 @@
+<!-- Spell Tinker
+[Roll = 1d100]
+[Result = "<font color=red size=+2><b>Chaos!!!</b></font><br>Fizzle and roll on Chaos table."]
+[Result = if (Roll >= 4, "<font color=red size=+1><b>Critical Failure!</b></font><br>Fizzle and roll on Critical Failure table.", Result)]
+[Result = if (Roll >= 8, "<font color=red size=+1><b>Fizzle</b></font><br>Spell fails, though cost is spent.", Result)]
+[Result = if (Roll >= 12, "<font color=red><b>Large Flaw</b></font><br>Roll on large flaw table.", Result)]
+[Result = if (Roll >= 18, "<font color=red><b>Slow Cast</b></font><br>Cost extra RAP. If not enough RAP, spell fizzles.", Result)]
+[Result = if (Roll >= 25, "<font color=red><b>Small Flaw</b></font><br>Roll on Small Flaw table.", Result)]
+[Result = if (Roll >= 65, "Normal<br>", Result)]
+[Result = if (Roll >= 77, "<font color=green><b>Small Boon</b></font><br>Roll on Small Boon table.", Result)]
+[Result = if (Roll >= 85, "<font color=green><b>Quick Cast</b></font><br>Cost 1 less RAP.", Result)]
+[Result = if (Roll >= 91, "<font color=green><b>Large Boon</b></font><br>Roll on Large Boon table.", Result)]
+[Result = if (Roll >= 96, "<font color=green size=+1><b>Critical Success!</b></font><br>Automatically hits and has maximum effect.", Result)]
+[Result = if (Roll >= 99, "<font color=green size=+1><b>Inspiration!</b></font><br>Critical success and gain Daily AP.", Result)]
+[Result = if (Roll >= 100, "<font color=green size=+2><b>Eureka!</b></font><br>Spell gets a small permanent upgrade.", Result)]
+[Result = "(" + Roll + ") " + Result]
+[macro.return = Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Charge Staff 
+[ChargeStamina = arg(0)]
+[ChargeFocus = arg(1)]
+[Extras = json.set(Extras, "ChargeStaffStamina", ChargeStamina)]
+[Extras = json.set(Extras, "ChargeStaffFocus", ChargeFocus)]
+[Result = "<b>Charge Staff Ritual</b>:<br> Staff now holds " + ChargeStamina + " stamina and " + ChargeFocus + " focus till end of day."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Drain Staff
+[ChargeStamina = de.lib.GetExtraProp("ChargeStaffStamina")]
+[ChargeStamina = if (ChargeStamina == "", 0, ChargeStamina)]
+[ChargeFocus = de.lib.GetExtraProp("ChargeStaffFocus")]
+[ChargeFocus = if (ChargeFocus == "", 0, ChargeFocus)]
+[Extras = json.set(Extras, "ChargeStaffStamina", 0)]
+[Extras = json.set(Extras, "ChargeStaffFocus", 0)]
+[CurStamina = CurStamina + ChargeStamina]
+[CurFocus = CurFocus + ChargeFocus]
+[Result = "<b>Staff Charge Consumed</b>:<br> <font color=green><b>" + ChargeStamina + "</b></font> stamina and <font color=green><b>" + ChargeFocus + "</b></font> pulled from staff.<br>"]
+[Result = Result + "Current Stamina:" + CurStamina + ", Focus:" + CurFocus]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Nullify Staff
+[Extras = json.set(Extras, "ChargeStaffStamina", 0)]
+[Extras = json.set(Extras, "ChargeStaffFocus", 0)]
+[Result = "<b>Staff Charge Nulled</b>:<br> Staff is not longer energized."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: GreyryaldsCoolSphere
+[CostString = po.lib.VerifyRequirements(0,1,1,0,0)]
+
+-- Perform Power
+        
+-- Output --
+[Result = "<b>Greyryald's Cool Sphere</b>:" + CostString]
+[Result = Result + "<br>A globe of light fills the casters palm (similar to torch).<br>Hand is taken up holding the sphere."]
+-->
+
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: DetectMagic
+[CostString = po.lib.VerifyRequirements(4,6,4,0,1)]
+
+-- Perform Power
+        
+-- Output --
+[Result = "<b>Detect Magic</b>:" + CostString]
+[Result = Result + "<br>For about 30 seconds, the caster can feel the presence of magic items or effects.<br>There is a chance some inkling of magical properties might be gleened.<br>(since ritual cast is short, Sta and Foc are spent, so remember to Quick Rest after.)"]
+-->
+
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Counter Spell
+[po.lib.VerifyRequirements(2,4,1,0,0)]
+[Roll = 2d10]
+-->
+[abort(input("junk|<html><b>Counter against which magic type?<br></html>|-|LABEL|SPAN=TRUE","AgainstSchool|Elemental,Black,White,Mind,Planes|vs. Type|RADIO | VALUE=STRING"))]
+[AgainstSchoolFull = "Skill"+AgainstSchool]
+[SchoolMod = eval(AgainstSchoolFull)]
+[Stat = "Intelligence"]
+[StatMod = de.lib.Mod(eval(Stat))]
+[CounterRoll = Roll + StatMod + SchoolMod]
+[Result = "<b>Counter Spell:</b> Spell Contest <font size=+1 color= green><b>" + CounterRoll + "</b></font> (Roll:" + Roll + ", " +  AgainstSchool + ":" + SchoolMod + ", " + Stat + ":" + StatMod +") vs " + AgainstSchool + ".<br> Success means spell fizzles (Sta and Foc lost, but SAP isn't)"]
+-->
+
+[macro.return = Result]

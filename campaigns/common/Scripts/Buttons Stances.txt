@@ -1,0 +1,43 @@
+<!-- Stances: Ignore Flank
+[de.lib.TestOwnership()]
+[ThisStance = "Ignore Flank"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+-->
+Taking  <font: color = blue><b>[Stance]</b></font> stance. (0 RAP)<br>
+Selected target is not granted flanking combat advantage.<br>
+Others flankers get +6 to hit, +6 Parry DC
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Stances: Ignore Flank
+[de.lib.TestOwnership()]
+[de.lib.ClearStanceScratchpad()]
+[Stance = "None"]
+-->
+Taking <font: color = blue><b>No Stance</b></font>. (0 RAP)<br>
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Stances: Resting
+[de.lib.TestOwnership()]
+[ThisStance = "Resting"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = "Resting"]
+[StanceToHitMelee = -2]
+[StanceToHitRange = -2]
+[StanceToHitSpell = -2]
+[StanceParry = -2]
+[StanceDodge = -2]
+[StanceWill = -2]
+[StanceFort = -2]
+-->
+Taking  <font: color = blue><b>[Stance]</b></font> stance.<br>
+ -2 all defenses,  -2 To Hit, -2 Parry, -2 Parry DC.  If resting at start of turn, gain 1 focus and stamina.
+

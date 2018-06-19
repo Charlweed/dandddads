@@ -1,0 +1,155 @@
+--------------------------------------------------------------------
+-- Display for NPCs
+--------------------------------------------------------------------
+
+---------------|Display|-----------------
+*#Stamina:{CurStamina} / {MaxStamina} ({TempStamina} temp)
+*#Focus:{CurFocus} / {MaxFocus} ({TempFocus} temp)
+*#Fatigue:{CurFatigue} / {MaxFatigue} ({TempFatigue} temp)
+*#Aura:{CurAura} / {MaxAura} ({TempAura} temp)
+*Life:{CurLife} / {MaxLife}
+*#Dodge
+*#Defenses:Reflex {Reflex}, Fort {Fortitude}, Will {Will}
+*#Saves:Bravery {Bravery}, Luck {Luck}, Sanity {Sanity}
+*#Round APs:{CurRoundAP}/{MaxRoundAP}
+*#Daily APs:{CurAP}/{MaxAP} Spell {CurSpellAP}/{MaxSpellAP}
+*#Move
+
+--------------------------------------------------------------------
+-- Display for Players
+--------------------------------------------------------------------
+
+---------------|Display|-----------------
+*Stamina:{CurStamina} / {MaxStamina} ({TempStamina} temp)
+*Focus:{CurFocus} / {MaxFocus} ({TempFocus} temp)
+*Fatigue:{CurFatigue} / {MaxFatigue} ({TempFatigue} temp)
+*Aura:{CurAura} / {MaxAura} ({TempAura} temp)
+*Life:{CurLife} / {MaxLife}
+*Move
+*Dodge
+*Defenses:Reflex {Reflex}, Fort {Fortitude}, Will {Will}
+*Saves:Bravery {Bravery}, Luck {Luck}, Sanity {Sanity}
+*Round APs:{CurRoundAP}/{MaxRoundAP}
+*Daily APs:{CurAP}/{MaxAP} Spell {CurSpellAP}/{MaxSpellAP}
+*Hero Points:{HeroPoints}
+
+--------------|Core Stats|----------------
+Strength
+Dexterity
+Constitution
+Intelligence
+Wisdom
+Charisma
+CoreStamina
+CoreFocus
+CoreFatigue
+CoreAura
+CoreRoundAP
+CoreAP
+CoreSpellAP
+CoreLife
+BodyType
+----------------|Current|----------------
+MaxStamina
+CurStamina
+TempStamina
+MaxFocus
+CurFocus
+TempFocus
+MaxFatigue
+CurFatigue
+TempFatigue
+MaxAura
+CurAura
+TempAura
+CurRoundAP
+MaxRoundAP
+MaxAP
+CurAP
+HeroPoints
+MaxSpellAP
+CurSpellAP
+MaxLife
+CurLife
+----------------|Combat|-----------------
+*MainHand
+*OffHand
+Level
+Encumberance
+Reflex
+Fortitude
+Will
+Bravery
+Luck
+Sanity
+*Stance
+InitBonus
+Expertise
+SkillAxe
+SkillBash
+SkillBow
+SkillChained
+SkillCrossbow
+SkillFinesse
+SkillLight
+SkillPolearm
+SkillShield
+SkillSword
+SkillThrown
+SkillMusic
+SkillCommand
+SkillHoly
+SkillUnholy
+SkillElemental
+SkillBlack
+SkillWhite
+SkillMind
+SkillPlanes
+SkillMonster
+LifeMinusStartsAt
+Extras
+Holdables
+----------------|Skills|-----------------
+Acrobatics
+Athletics
+Diplomacy
+Dungeoneering
+HighSociety
+Insight
+Intimidate
+Lore
+Medical
+Nature
+Perception
+Stealth
+Streetwise
+Thievery
+------------|Equipment|-------------
+CarriedWeapons
+Armor
+Experience
+Provisions
+Platinum
+Gold
+Silver
+Copper
+-------------|Scratch Pad|---------------
+LastParried
+StanceToHitMelee
+StanceToHitRange
+StanceToHitSpell
+StanceDamageMelee
+StanceDamageRange
+StanceDamageSpell
+StanceParry
+StanceDodge
+StanceWill
+StanceFort
+StanceToHitStat
+StanceIgnoreLifeMinus
+ParriesThisRound
+LastTargetAccuracy
+LastTargetHeightAdj
+LastTargetBodyType
+LastMedKit
+LastWoundTended

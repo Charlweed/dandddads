@@ -1,0 +1,50 @@
+
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- FullRest
+[MaxStamina = CoreStamina]
+[CurStamina = MaxStamina]
+[TempStamina = 0]
+[MaxFocus = CoreFocus]
+[CurFocus = MaxFocus]
+[TempFocus = 0]
+[MaxFatigue = CoreFatigue]
+[CurFatigue = MaxFatigue]
+[TempFatigue = 0]
+[MaxAura = CoreAura]
+[CurAura = MaxAura]
+[TempAura = 0]
+[MaxRoundAP = CoreRoundAP]
+[CurRoundAP = MaxRoundAP]
+[MaxAP = CoreAP]
+[CurAP = MaxAP]
+[MaxSpellAP = CoreSpellAP]
+[CurSpellAP = MaxSpellAP]
+[ParriesThisRound = 0]
+[state.Dying = 0]
+[state.Confused = 0]
+[state.Stunned = 0]
+[state.Prone = 0]
+[state.Shakened = 0]
+[state.Unconcious = 0]
+[CurLife = if (CurLife < 0, 0, CurLife)]
+-->
+does a full rest.
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Rest Quick
+[de.lib.TestOwnership()]
+[CurStamina = MaxStamina]
+[CurFocus = MaxFocus]
+[CurRoundAP = MaxRoundAP]
+[ParriesThisRound = 0]
+[state.Dying = 0]
+[state.Confused = 0]
+[state.Stunned = 0]
+[state.Prone = 0]
+[state.Shakened = 0]
+[state.Unconcious = 0]
+[CurLife = if (CurLife < 0, 0, CurLife)]
+-->
+has done a quick rest.

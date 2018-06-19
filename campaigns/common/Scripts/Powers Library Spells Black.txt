@@ -1,0 +1,37 @@
+<!-- Powers Library: Necrotic Bolt
+[CostString = po.lib.VerifyRequirements(2,4,5,0,0)]
+
+-- Perform Power
+[NecroticToHit = de.lib.GetExtraProp("NecroticToHit")]
+[NecroticToHit = if(NecroticToHit == "", 0, NecroticToHit)]
+[NecroticDamage = de.lib.GetExtraProp("NecroticDamage")]
+[NecroticDamage = if(NecroticDamage == "", 0, NecroticDamage)]
+[AttackRoll = 2d10]
+[SkillVal = de.lib.LookupMagicSkill("SkillBlack")]
+[Attack = AttackRoll + SkillVal + StanceToHitSpell + NecroticToHit]
+[DamageRoll = 1d4]
+[Damage = DamageRoll + SkillVal + StanceDamageSpell + NecroticDamage]
+        
+-- Output --
+[Result = "<b>Necrotic Bolt</b>:" + CostString]
+[Result = Result + "<br>Attack: <font size=+2 color=green><b>" + Attack + "</b></font> vs <font size=+2 color=blue>Dodge</font></b><br>"]
+[Result = Result + "(Roll:" + AttackRoll + ", Elem:" + SkillVal]
+[if (NecroticToHit != 0), code: {
+    [Result = Result + ", Necrotic:" + NecroticToHit]
+}]
+[if (StanceToHitSpell != 0), code: {
+    [Result = Result + ", Stance:" + StanceToHitSpell]
+}]
+[Result = Result + ")<br>"]
+[Result = Result + "Damage: <font size=+2 color=red><b>" + Damage + "</b></font>"]
+[Result = Result + "<br>(Roll:" + DamageRoll + ", Elem:" + SkillVal]
+[if (NecroticDamage != 0), code: {
+    [Result = Result + ", Necrotic:" + NecroticDamage]
+}]
+[if (StanceDamageSpell != 0), code: {
+    [Result = Result + ", Stance:" + StanceDamageSpell]
+}]
+[Result = Result + ")<br>"]
+[Result = Result + "Damage bypasses armor. Condition Track: Shaken->Confused->Stunned->Unconscious->Death<br>DC 12 Fort Save, success step back, fail advance + 1d4 dam.<br>Successive hits also advance the track."]
+-->
+[macro.return = Result]

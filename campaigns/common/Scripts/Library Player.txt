@@ -1,0 +1,316 @@
+<!-- Library: CalcHealDC
+[de.lib.TestOwnership()]
+[FirstAidCheck = getLibProperty("LastFirstAidCheck")]
+[LastEnvironmentMod = getLibProperty("LastEnvironmentMod")]
+[abort(input("junk|<html><b>Heal Check:<br></html>|-|LABEL|SPAN=TRUE","Damage","Cut|0|Broke Skin?|CHECK", "LastEnvironmentMod|"+LastEnvironmentMod+"|Environment Mods", "Other|0|Other Mods", "FirstAid|"+FirstAidCheck+"|First Aid"))]
+[setLibProperty("LastEnvironmentMod", LastEnvironmentMod)]
+[FirstAidMod = if (FirstAid > 10, FirstAid - 10, 0)]
+[DC = 10 + Damage + if(Cut,LastEnvironmentMod,0) + Other - FirstAidMod]
+[DC = if (DC < 8, 8, DC)]
+[setLibProperty("LastEnvironmentMod", LastEnvironmentMod)]
+[Result = "Injury Heal DC: <font color=blue size=+2><b>" + DC + "</b></font><br>(Base:10, Dam:" + Damage + ","]
+[Result = Result + if(Cut,"Env:" + LastEnvironmentMod + ",", "") + if(Other > 0,"Other:" + Other + ",", "") + "- Aid:" + FirstAidMod + "; minumum DC 8)"]
+[macro.return = Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: First Aid
+[de.lib.TestOwnership()]
+[LastMedKit = if (LastMedKit == "", 0, LastMedKit)]
+[LastWoundTended = if (LastWoundTended == "", 0, LastWoundTended)]
+[abort(input("junk|<html><b>First Aid Check<br></html>|-|LABEL|SPAN=TRUE","LastMedKit|" + LastMedKit + "|Healing Kit","LastWoundTended|" + LastWoundTended + "|Wounds Tended"))]
+[Roll = 2d10]
+[StatMod = min(de.lib.Mod(Intelligence), Medical)]
+[MedicalSkill = Medical + StatMod]
+[FirstAidCheck = max(Roll + MedicalSkill - 12 + LastMedKit - LastWoundTended, 0)]
+[Result = "First Aid Check: "]
+[Result = Result + if(FirstAidCheck > 0, "<font color=green", "<font color=red") + " size=+2><b>"]
+[Result = Result + FirstAidCheck + "</b></font><br> (Roll:" + Roll + ", Medical:" + MedicalSkill + ", MedKit:" + LastMedKit + ", Tended:-" + LastWoundTended + ", - 2)"]
+[LastWoundTended = LastWoundTended + 1]
+[setLibProperty("LastFirstAidCheck", FirstAidCheck)]
+[macro.return = Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: GetBodyLocs
+[BodyType = arg(0)]
+[BodyLocs = '["BadBodyType"]']
+[BodyLocs = if (BodyType == "Humanoid", '["Head", "Face", "Neck", "Chest", "Back", "Shoulder L", "Shoulder R", "Upper Arm L", "Upper Arm R", "Elbow L", "Elbow R", "Lower Arm L", "Lower Arm R", "Hand L", "Hand R", "Stomach", "Hips", "Groin", "Thigh L", "Thigh R", "Knee L", "Knee R", "Calf L", "Calf R", "Foot L", "Foot R"]', BodyLocs)]
+[BodyLocs = if (BodyType == "Animal", '["Head", "Face", "Neck", "Chest", "Back", "Front Leg", "Front Hand", "Stomach", "Rear", "Groin", "Tail", "Back Leg", "Back Foot"]', BodyLocs)]
+[BodyLocs = if (BodyType == "Insect", '["Head", "Under Thorax", "Front Leg", "Top Thorax", "Under Abdomen", "Top Abdomen", "Back Leg"]', BodyLocs)]
+[BodyLocs = if (BodyType == "Body", '["Body"]', BodyLocs)]
+
+[macro.return = BodyLocs]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: GetExtraProp
+[Property = arg(0)]
+[Value = json.get(Extras, Property)]
+[macro.return = Value]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: HealCheck
+[de.lib.TestOwnership()]
+[FirstAidCheck = getLibProperty("LastFirstAidCheck")]
+[LastEnvironmentMod = getLibProperty("LastEnvironmentMod")]
+[abort(input("junk|<html><b>Heal Check:<br></html>|-|LABEL|SPAN=TRUE","HealDC|0|Heal DC","Cut|0|Broke Skin?|CHECK", "LastEnvironmentMod|"+LastEnvironmentMod+"|Environment Mods", "StrenuousSegs|0|Strenuous Segments", "RestSegs|0|Rest Segments", "Other|0|Other Mods", "FirstAid|"+FirstAidCheck+"|First Aid"))]
+[FirstAidMod = if (FirstAid > 10, FirstAid - 10, 0)]
+[setLibProperty("LastEnvironmentMod", LastEnvironmentMod)]
+[Roll = 2d10]
+[StatMod = de.lib.Mod(Constitution)]
+[HealRoll = Roll + StatMod - if(Cut,LastEnvironmentMod,0) - Other - StrenuousSegs + RestSegs + FirstAidMod]
+[Diff = HealRoll - HealDC]
+[Result = "Heal Check: <font color=" + if(HealRoll>=HealDC,"green","red") + " size=+2><b>" + HealRoll + "</b></font> vs <font color=blue size=+2><b>" + HealDC + "</b></font><br>"]
+[Result = Result + "(Roll:" + Roll + ", Con:" + StatMod]
+[Result = Result + if(Cut,", - Env:" + LastEnvironmentMod, "")]
+[Result = Result + if(StrenuousSegs>0,", - Strenuous Segments:" + StrenuousSegs, "")]
+[Result = Result + if(RestSegs>0,", + Rest Segments:" + RestSegs, "")]
+[Result = Result + if(Other>0,", - Other:" + Other, "")]
+[Result = Result + ", Aid Mod:" + FirstAidMod + ")<br>"]
+[if (Diff >= 10), code: {
+    [NewDC = max(HealDC - 2, 1)]
+    [Result = Result + "Heal <font color=green size=+2><b>2</b></font> pips and Heal DC is now <font color=green size=+2><b>" + NewDC + "<b></font><br>"]
+}]
+[if (Diff >= 5 && Diff < 10), code: {
+    [NewDC = max(HealDC - 1, 1)]
+    [Result = Result + "Heal <font color=green size=+2><b>1</b></font> pip and Heal DC is now <font color=green size=+2><b>" + NewDC + "<b></font><br>"]
+}]
+[if (Diff >= 0 && Diff < 5), code: {
+    [Result = Result + "Heal <font color=green size=+2><b>1</b></font> pip. Heal DC remains the same.<br>"]
+}]
+[if (Diff >= -5 && Diff < 0), code: {
+    [Result = Result + "No heal. Heal DC remains the same.<br>"]
+}]
+[if (Diff >= -10 && Diff < -5), code: {
+    [NewDC = HealDC + 1]
+    [Result = Result + "Take <font color=red size=+2><b>1</b></font> pip and Heal DC is now <font color=green size=+2><b>" + NewDC + "<b></font><br>"]
+}]
+[if (Diff < -10), code: {
+    [NewDC = HealDC + 2]
+    [Result = Result + "Take <font color=red size=+2><b>2</b></font> pips and Heal DC is now <font color=green size=+2><b>" + NewDC + "<b></font><br>"]
+}]
+[macro.return = Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Library: LookupMagicSkill
+[Skill = arg(0)]
+[MagicStat = if (Skill == "SkillMusic" || Skill == "SkillCommand", "Charisma", "Intelligence")]
+[MagicStat = if (Skill == "SkillHoly" || Skill == "SkillUnholy", "Wisdom", MagicStat)]
+[StatBonus = de.lib.Mod(eval(MagicStat))]
+[SkillVal = eval(Skill)]
+[SkillVal = if (SkillVal > 0, SkillVal + StatBonus, 0)]
+[macro.return = SkillVal]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: LoseInitiative
+[ParriesThisRound = 0]
+[CurRoundAP = MaxRoundAP]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: ReceiveInitiative
+[Output = "<font size=+1 color=blue><b>" + token.name + "</b></font>:<br>"]
+[if (Stance == "Resting"), code: {
+    [StamGain = if(CurStamina < MaxStamina, 1, 0)]
+    [FocusGain = if(CurFocus < MaxFocus, 1, 0)]
+    [Output = Output + "Resting Stance: Stamina " + CurStamina + " (+" + StamGain + "), Focus " + CurFocus + "(+" + FocusGain + ")<br>"]
+    [CurStamina = CurStamina + StamGain]
+    [CurFocus = CurFocus + FocusGain]
+}]
+[if (Stance == "Light Aura"), code: {
+    [Output = Output + "Light Aura Stance: Allies within 25 gain 1 Stamina or Focus.<br>"]
+}]
+[macro.return = Output]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- RemoveExtraProp
+[Property = arg(0)]
+[Extras = json.remove(Extras, Property)]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Library: RestAction
+[de.lib.TestOwnership()]
+[Title = if(Stance == "Resting","Resting: 1 RAP per point recovered","<font color=red><b>Will enter Resting stance:</b></font> <br>1 + 1 RAP per point recovered.")]
+[Title = Title + " (" + CurRoundAP + " RAP available)"]
+[RAPCost = if(Stance == "Resting",0, 1)]
+-- Can needed Stance change be covered?
+[de.lib.ExpendRAP(RAPCost,0)]  
+[assert(macro.return == "Success", macro.return)]
+[abort(input(
+    "junk|<html>"+Title+"</html>|-|LABEL|SPAN=TRUE",
+    "StaminaGain|0|Stamina Gain (" + CurStamina + "/" + MaxStamina + ")",
+    "FocusGain|0|Focus Gain (" + CurFocus + "/" + MaxFocus + ")"))]
+
+-- Calculate gains    
+[OldStamina = CurStamina]
+[OldFocus = CurFocus]
+[CurMaxStamina = max(CurStamina, MaxStamina)]
+[CurMaxFocus = max(CurFocus, MaxFocus)]
+[NewCurStamina = min(CurStamina + StaminaGain, CurMaxStamina)]
+[NewCurFocus = min(CurFocus + FocusGain, CurMaxFocus)]
+-- were there wasted points?
+[ActualStaminaGain = NewCurStamina - OldStamina]
+[ActualFocusGain = NewCurFocus - OldFocus]
+[ActualRAPSpent = ActualStaminaGain + ActualFocusGain]
+
+-- See if price can be spent
+[RAPCost = RAPCost + ActualStaminaGain + ActualFocusGain]
+[de.lib.ExpendRAP(RAPCost,0)]  
+[assert(macro.return == "Success", macro.return)]
+[de.lib.ExpendRAP(ActualRAPSpent,1)]
+[CurStamina = NewCurStamina]
+[CurFocus = NewCurFocus]
+[Output = ""]
+
+-- Perform stance change if needed
+[if(Stance != "Resting"), code: {
+    [Output = po.lib.Resting()]
+}]
+
+[Output = Output + "<b>Resting Action</b>:<br>"]
+[Output = if (CurStamina != OldStamina, Output + "New Stamina is " + CurStamina +".<br>", Output)]
+[Output = if (CurFocus != OldFocus, Output + "New Focus is " + CurFocus +".<br>", Output)]
+[Output = if (CurStamina == OldStamina && CurFocus == OldFocus, Output + "No Stamina or Focus gained.<br>", Output)]
+-->
+[macro.return = Output]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: RollToHit
+[Weapon = arg(0)]
+[StaminaCost = arg(1)]
+[FocusCost = arg(2)]
+[RAPCost = arg(3)]
+[ToHitBonus = arg(4)]
+-- Check requirements
+[MinStr = de.lib.LookupWeaponStat(Weapon, "MinStr")]
+[MinStrStam = de.lib.LookupWeaponStat(Weapon, "MinStrStam")]
+[StaminaCost = if(Strength < MinStrStam, StaminaCost + 1, StaminaCost)]
+[CostString = po.lib.VerifyRequirements(StaminaCost,FocusCost,RAPCost,0,0)]
+
+[IsRanged = de.lib.IsRangedWeapon(Weapon)]
+[StanceBonus = if (IsRanged, StanceToHitRange, StanceToHitMelee)]
+[ToHitStat = de.lib.LookupWeaponStat(Weapon, "ToHitStat")]
+[WeaponType = de.lib.LookupWeaponStat(Weapon, "Type")]
+[ToHitStat = if (Dexterity > Strength && WeaponType == "Finesse", "Dexterity", ToHitStat)]
+[ToHitStat = if (StanceToHitStat == "", ToHitStat, StanceToHitStat)]
+[StatBonus = de.lib.Mod(eval(ToHitStat))]
+[Skill = eval("Skill" + WeaponType)]
+[HaveExpertise = json.contains(Expertise, Weapon)]
+[LifeMinus = de.lib.CurrentLifeMinus()]
+[Roll = 2d10]
+[ParryDC = ToHitBonus + StatBonus + Skill + HaveExpertise + LifeMinus + StanceBonus]
+[ToHit = Roll + ParryDC]
+[ParryDC = ParryDC + 10]
+[ParryDC = if (Roll == 18, ParryDC + 2, ParryDC)]
+[ParryDC = if (Roll == 19, ParryDC + 4, ParryDC)]
+[ParryDC = if (Roll == 20, ParryDC + 6, ParryDC)]
+[ParryID = de.lib.LookupWeaponStat(Weapon, "Parry") - 1]   
+[ParryList = getLibProperty("ParryNames")]
+[ParryType = json.get(ParryList, ParryID)]
+[Result = CostString + "<br>Roll to hit with " + Weapon + ": <font color=green size=+2><b>" + ToHit + "</b></font>, ParryDC:<font color=blue><b>" + ParryDC + "</b></font>, <font color=blue>" + ParryType + "</font><br>"]
+[Result = if(Strength < MinStrStam, Result + "(+1 Stamina cost due to low strength)<br>",Result)]
+[Result = Result + "( Roll "+ Roll]
+[Result = if(ToHitBonus != 0, Result + ", Attack " + ToHitBonus, Result)]
+[Result = Result + ", Stat used: " + ToHitStat]
+[Result = if(StatBonus != 0, Result + ", Stat " + StatBonus, Result)]
+[Result = if(Skill != 0, Result + ", Skill " + Skill, Result)]
+[Result = if(HaveExpertise != 0, Result + ", Expertise " + HaveExpertise, Result)]
+[Result = if(LifeMinus != 0, Result + ", LifeMinus " + LifeMinus, Result)]
+[Result = if(StanceBonus != 0, Result + ", StanceBonus " + StanceBonus, Result)]
+[Result = Result + " )<br>"]
+[Result = if (Roll >= 18, Result + "<font color=red>CRITICAL HIT!</font> First damage point goes to life. ", Result)]
+[Result = if (Roll == 18, Result + "+10 to Acc<br>", Result)]
+[Result = if (Roll == 19, Result + "+30 to Acc<br>", Result)]
+[Result = if (Roll == 20, Result + "+100 to Acc<br>", Result)]
+[Result = if (Roll <= 3, Result + "<font color=red>CRITICAL FUMBLE!</font> Roll on fumble chart.", Result)]
+
+[macro.return = Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: RollToHit OBSOLETE!!!!!
+[Weapon = arg(0)]
+[StaminaCost = arg(1)]
+[FocusCost = arg(2)]
+[RAPCost = arg(3)]
+[ToHitBonus = arg(4)]
+-- Check requirements
+[MinStr = de.lib.LookupWeaponStat(Weapon, "MinStr")]
+[MinStrStam = de.lib.LookupWeaponStat(Weapon, "MinStrStam")]
+[StaminaCost = if(Strength < MinStrStam, StaminaCost + 1, StaminaCost)]
+[AvailStamina = CurStamina + TempStamina]
+[AvailFocus = CurFocus + TempFocus]
+[if (StaminaCost > AvailStamina || FocusCost > AvailFocus), code: {
+    [Result = "Rolling to hit with " + Weapon + ".<br>"]
+    [Result = if(Strength < MinStrStam, Result + "(+1 Stamina cost due to low strength)<br>",Result)]
+    [Result = if (StaminaCost > AvailStamina, Result + "<font color=red><b>Stamina too low</b></font> (need " + StaminaCost + ", have " + AvailStamina + ")<br>", Result)]
+    [Result = if (FocusCost > AvailFocus, Result + "<font color=red><b>Focus too low</b></font> (need " + FocusCost + ", have " + AvailFocus + ")<br>", Result)]
+};
+{
+    [de.lib.ExpendStat("Stamina", StaminaCost, 1)]
+    [de.lib.ExpendStat("Focus", FocusCost, 1)]
+    [de.lib.ExpendRAP(RAPCost,1)]
+    [IsRanged = de.lib.IsRangedWeapon(Weapon)]
+    [StanceBonus = if (IsRanged, StanceToHitRange, StanceToHitMelee)]
+    [ToHitStat = de.lib.LookupWeaponStat(Weapon, "ToHitStat")]
+    [WeaponType = de.lib.LookupWeaponStat(Weapon, "Type")]
+    [ToHitStat = if (Dexterity > Strength && WeaponType == "Finesse", "Dexterity", ToHitStat)]
+    [ToHitStat = if (StanceToHitStat == "", ToHitStat, StanceToHitStat)]
+    [StatBonus = de.lib.Mod(eval(ToHitStat))]
+    [Skill = eval("Skill" + WeaponType)]
+    [HaveExpertise = json.contains(Expertise, Weapon)]
+    [LifeMinus = de.lib.CurrentLifeMinus()]
+    [Roll = 2d10]
+    [ParryDC = ToHitBonus + StatBonus + Skill + HaveExpertise + LifeMinus + StanceBonus]
+    [ToHit = Roll + ParryDC]
+    [ParryDC = ParryDC + 10]
+    [ParryDC = if (Roll == 18, ParryDC + 2, ParryDC)]
+    [ParryDC = if (Roll == 19, ParryDC + 4, ParryDC)]
+    [ParryDC = if (Roll == 20, ParryDC + 6, ParryDC)]
+    [ParryID = de.lib.LookupWeaponStat(Weapon, "Parry") - 1]   
+    [ParryList = getLibProperty("ParryNames")]
+    [ParryType = json.get(ParryList, ParryID)]    
+    [Result = "Roll to hit with " + Weapon + " (Stam " + StaminaCost + ", Foc " + FocusCost + "): <font color=green size=+2><b>" + ToHit + "</b></font>, ParryDC:<font color=blue><b>" + ParryDC + "</b></font>, <font color=blue>" + ParryType + "</font><br>"]
+    [Result = if(Strength < MinStrStam, Result + "(+1 Stamina cost due to low strength)<br>",Result)]
+    [Result = Result + "( Roll "+ Roll]
+    [Result = if(ToHitBonus != 0, Result + ", Attack " + ToHitBonus, Result)]
+    [Result = Result + ", Stat used: " + ToHitStat]
+    [Result = if(StatBonus != 0, Result + ", Stat " + StatBonus, Result)]
+    [Result = if(Skill != 0, Result + ", Skill " + Skill, Result)]
+    [Result = if(HaveExpertise != 0, Result + ", Expertise " + HaveExpertise, Result)]
+    [Result = if(LifeMinus != 0, Result + ", LifeMinus " + LifeMinus, Result)]
+    [Result = if(StanceBonus != 0, Result + ", StanceBonus " + StanceBonus, Result)]
+    [Result = Result + " )<br>"]
+    [Result = if (Roll >= 18, Result + "<font color=red>CRITICAL HIT!</font> First damage point goes to life. ", Result)]
+    [Result = if (Roll == 18, Result + "+10 to Acc<br>", Result)]
+    [Result = if (Roll == 19, Result + "+30 to Acc<br>", Result)]
+    [Result = if (Roll == 20, Result + "+100 to Acc<br>", Result)]
+    [Result = if (Roll <= 3, Result + "<font color=red>CRITICAL FUMBLE!</font> Roll on fumble chart.", Result)]
+}]
+[macro.return = Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: SetExtraProp
+[Property = arg(0)]
+[Value = arg(1)]
+[Extras = json.set(Extras, Property, Value)]
+-->
+
+------------------------------------------------------------------------------------------------------------------------

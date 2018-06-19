@@ -1,0 +1,118 @@
+<!-- Powers Library: Aimed Attack
+[de.lib.TestOwnership()]
+[IsRanged = de.lib.IsRangedWeapon(MainHand)]
+[RAPCost = if (IsRanged, 5, 4)]
+[Result = de.lib.ExpendRAP(RAPCost,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[StamCost = if (IsRanged, 0, 1)]
+[FocusCost = if (IsRanged, 3, 2)]
+[Result = de.lib.RollToHit(MainHand, StamCost, FocusCost, RAPCost, -1)]
+[Result = "<b>Aimed Attack</b>: " + Result]
+[Result = Result + "<br>Aimed +10 Accuracy."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Basic Attack
+[de.lib.TestOwnership()]
+[IsRanged = de.lib.IsRangedWeapon(MainHand)]
+[RAPCost = if (IsRanged, 5, 4)]
+[StamCost = if (IsRanged, 0, 1)]
+[FocusCost = if (IsRanged, 1, 0)]
+[Result = de.lib.RollToHit(MainHand, StamCost, FocusCost, RAPCost, 0)]
+[Result = "<b>Basic Attack</b>: " + Result]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Basic Offhand Attack
+[de.lib.TestOwnership()]
+[IsRanged = de.lib.IsRangedWeapon(OffHand)]
+[RAPCost = if (IsRanged, 5, 4)]
+[StamCost = if (IsRanged, 0, 1)]
+[FocusCost = if (IsRanged, 1, 0)]
+[Result = de.lib.RollToHit(OffHand, StamCost, FocusCost, RAPCost, 0)]
+[Result = "<b>Offhand Attack</b>: " + Result]
+-->
+[macro.return = Result]
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Light Attack
+[de.lib.TestOwnership()]
+[IsRanged = de.lib.IsRangedWeapon(MainHand)]
+[RAPCost = if (IsRanged, 5, 4)]
+[Result = de.lib.RollToHit(MainHand, 0, 0, RAPCost, -1)]
+[Result = "<b>Light Attack</b>: " + Result]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Opportunity Attack
+[de.lib.TestOwnership()]
+[IsRanged = de.lib.IsRangedWeapon(MainHand)]
+[assert(!IsRanged, "<font color=red><b>Ranged weapons can't be used for Opportunity Attacks.</b></font>")]
+[Result = de.lib.RollToHit(MainHand, 0, 0, 1, 0)]
+[Result = "<b>Opportunity Attack</b>: " + Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Aimed Attack
+[de.lib.TestOwnership()]
+[IsRanged = de.lib.IsRangedWeapon(MainHand)]
+[RAPCost = if (IsRanged, 5, 4)]
+[Result = de.lib.ExpendRAP(RAPCost,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[StamCost = if (IsRanged, 0, 2)]
+[FocusCost = if (IsRanged, 3, 1)]
+[Result = de.lib.RollToHit(MainHand, StamCost, FocusCost, RAPCost, -1)]
+[Result = "<b>Aimed Attack</b>: " + Result]
+[Result = Result + "<br>Aimed +10 Accuracy."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Fake
+[de.lib.TestOwnership()]
+[Result = de.lib.ExpendRAP(4,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[Result = "<b>Fake</b>:<br>"]
+[IsFinesse = de.lib.IsFinesseWeapon(MainHand)]
+[IsMonster =  de.lib.IsMonsterWeapon(MainHand)]
+[if (IsFinesse || IsMonster), code:{
+    [Roll = 2d10]
+    [StatBonus = de.lib.Mod(Dexterity)]
+    [RollToFake = Roll + StatBonus]
+    [Result = Result + "Fake Roll against INT: <font color=green size=+2><b>" + RollToFake + "</b></font> (" + Roll + " + Dex " + StatBonus + ")<br>"]
+    [Result = Result + "If success, +2 to hit, +2 parry DC, +2 Accuracy<br>"]
+    [Result = Result + de.lib.RollToHit(MainHand, 3, 5, 4, 0)]
+};
+{
+    [Result = "<font color=red>Can't use Fake because " + MainHand + " is not a finesse weapon.</font>"]
+}]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: CalculatedSlice
+[de.lib.TestOwnership()]
+[Result = de.lib.ExpendRAP(4,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[Result = "<b>Calculated Slice</b>:<br>"]
+[IsFinesse = de.lib.IsFinesseWeapon(MainHand)]
+[if (IsFinesse), code:{
+    [Roll = 2d10]
+    [StatBonus = de.lib.Mod(Dexterity)]
+    [Result = Result + de.lib.RollToHit(MainHand, 2, 4, 4, 0)]
+    [Result = Result + "If hit, +4 accuracy"]
+};
+{
+    [Result = Result + "<font color=red>Can't use Calculated Slice because " + MainHand + " is not a finesse weapon.</font>"]
+}]
+-->
+[macro.return = Result]

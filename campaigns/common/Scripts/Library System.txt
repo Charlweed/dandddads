@@ -1,0 +1,66 @@
+<!-- Library: onCampaignLoad -->
+@@ @onCampaignLoad
+[H: '<!-- Debug functions from  zEal -->']
+[ defineFunction("debug", "debug@this", 1, 0 ) ]
+[ defineFunction("displayDebug", "displayDebug@this", 1, 0 ) ]
+[ defineFunction("pause", "pause@this", 1, 0 ) ] 
+
+[H: '<!-- All functions will be given a UDF name excluding tags and special characters -->']
+[H: prefix = "de.lib."]
+[H: this = getMacroLocation()]
+
+[H: '<!-- Macro names ending with .html will allow output. "local" also sets newScope to 0. -->']
+[H: outputExtensions = json.append("","html","local","out","output","sub","css")]
+
+[H: '<!-- Define functions here with options other than ignoreOutput = 1 and NewScope = 1 -->']
+[H: defineFunction(prefix+"GetCurrentTime","GetCurrentTime@this",1,0)]
+[H: defineFunction(prefix+"BarHP2","BarHP2@this",0,0)]
+[H: defineFunction(prefix+"ReadWeaponNames","ReadWeaponNames@this",1,0)]
+[H: defineFunction(prefix+"ReadParryNames","ReadParryNames@this",1,0)]
+[H: defineFunction(prefix+"ExpendStat","ExpendStat@this",1,0)]
+[H: defineFunction(prefix+"TestStat","TestStat@this",1,0)]
+[H: defineFunction(prefix+"AssignWeapons","AssignWeapons@this",0,0)]
+[H: defineFunction(prefix+"SetInitiative","SetInitiative@this",0,0)]
+
+[H: '<!-- List functions names here to exclude from UDF definition -->']
+[H: excludeList = json.append("","(new)")]
+[H: tableFunctions = json.difference(getMacros("json"),excludeList)]
+
+[H: '<!-- Define UDFs.  Already defined UDFs will not be redefined. -->']
+[H, foreach(fn,tableFunctions), code: {
+   [H: fName = replace(fn,"<[^>]*?>","")]
+   [H: fName = replace(fName,"[^a-zA-Z0-9_.]","")]
+   [H: cleanFN = strformat("%{prefix}%{fName}")]
+   [H: extension = listGet(cleanFN,listCount(cleanFN,".")-1,".")]
+   [H: newScope = 1 - listContains("local,sub",extension)]
+   [H: ignoreOutput = 1 - json.contains(outputExtensions,extension)]
+   [H: exclude = listContains("x",extension)]
+   [H, if(! isFunctionDefined(cleanFN) && ! exclude): defineFunction(cleanFN,strformat("%{fn}@"+this),ignoreOutput,newScope)]
+}]
+
+------------------------------------------------------------------------------------------------------------------------
+
+[H: '<!-- Lookup Weapon names from table -->']
+[H: de.lib.ReadWeaponNames()]
+[H: de.lib.ReadParryNames()]
+[H: de.lib.ReadBodyTypeNames()]
+!! 
+
+[h: Continue = 1]
+[h: CurrentName = "NotValid"]
+[h: ParryNames = ""]
+[h: i = 1]
+[h, while(Continue), code: {
+    [h: LastName = CurrentName]
+    [h: jsonData= table("Parry", i)]
+    [h: CurrentName = json.get(jsonData, "Name")]
+    [h, if (LastName == CurrentName), code:
+    {
+        [h: Continue = 0]
+    };
+    {
+        [h: ParryNames = json.append(ParryNames, CurrentName)]
+    }]
+    [h: i = i + 1]
+}]
+[h: setLibProperty("ParryNames", ParryNames)]

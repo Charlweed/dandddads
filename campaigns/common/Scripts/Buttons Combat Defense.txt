@@ -1,0 +1,44 @@
+<!-- Dodge
+[de.lib.TestOwnership()]
+[de.lib.ExpendRAP(1,0)]
+[assert(macro.return == "Success", macro.return)]
+[Roll = 1d6]
+[ActiveDodge = Dodge + Roll]
+-->
+[h:de.lib.ExpendRAP(1,1)]
+Active Dodge: <font color=green size=+2><b>[ActiveDodge]</b></font> (Dodge [Dodge], Active [Roll])<br>
+Must shift to new square.  1 RAP spent ([CurRoundAP] RAP remaining)
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Parry
+[de.lib.TestOwnership()]
+[de.lib.ExpendRAP(1,0)]
+[assert(macro.return == "Success", macro.return)]
+-->
+[de.lib.RollToParry()]
+[h:ParriesThisRound = ParriesThisRound + 1]
+[h:de.lib.ExpendRAP(1,1)]
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Show Hit Armor
+[LastHit = de.lib.GetLastToHitArmorLoc()]
+[Num = json.length(LastHit)]
+[result=""]
+[for(i,0,json.length(LastHit),1), code: {
+    [BodyLoc = json.get(LastHit, i)]
+    [ArmorVal = json.get(Armor, BodyLoc)]
+    [result = result+"<b>"+BodyLoc+"</b> : "+ArmorVal+"<br>"]       
+}]
+-->
+[result]
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Edit All Armor 
+[de.lib.TestOwnership()]
+[de.lib.AssignArmor()]
+-->
