@@ -1,0 +1,215 @@
+<!-- Draw Offhand
+[de.lib.TestOwnership()]
+[de.lib.ExpendRAP(1,0)]
+[assert(macro.return == "Success", macro.return)]
+[de.lib.ExpendRAP(1,1)]
+[OffhandWeapons = "[]"]
+[ for(i,0,json.length(CarriedWeapons),1), code: {
+    -- Check if this is a valid offhand weapon to choose --
+    [Weapon = json.get(CarriedWeapons, i)]
+    [IsOffHand = de.lib.LookupWeaponStat(Weapon,"Offhand")]
+    [ if (IsOffHand == 1): OffhandWeapons = json.append(OffhandWeapons,Weapon)]
+}]
+[status=abort(input(
+    "OffHand|"+json.toList(OffhandWeapons)+"|Draw Weapon|LIST|SELECT=0 VALUE=STRING"
+))]
+-- Removed two handed main hand --
+[Result = ""]
+[ if (matches(MainHand, ".*2H")), code: {
+    [MainHand = substring(MainHand,0,length(OffHand)-3)]
+    [Result = "Switching two handed grip on " + MainHand + " to single hand.<br>"]
+};
+{
+    [IsMainTwoHanded = de.lib.LookupWeaponStat(MainHand,"TwoHands")]
+    [ if (IsMainTwoHanded == 2), code: {
+
+        [Result = "Dropping two handed weapon " + MainHand + ".<br>"]
+        [MainHand = "Fist"]
+    };
+    {}]
+}]
+-->
+[r: Result] Now holding [MainHand] / [OffHand]. 1 RAP spent ([CurRoundAP] RAP remaining).
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Draw Weapon
+[de.lib.TestOwnership()]
+[de.lib.ExpendRAP(1,0)]
+[assert(macro.return == "Success", macro.return)]
+[de.lib.ExpendRAP(1,1)]
+[status=abort(input(
+    "MainHand|"+json.toList(CarriedWeapons)+"|Draw Weapon|LIST|SELECT=0 VALUE=STRING"
+))]
+[Result = ""]
+-- Check if weapon is two handed. --
+[if (matches(MainHand, ".*2H")), code: {
+    [Drop = if((OffHand != "Fist") && (matches(OffHand, ".*2H") == 0), 1, 0)]
+    [if (Drop): Result = "Dropping " + OffHand + " to hold two handed.<br>"]
+    [OffHand = MainHand]
+    [Result = Result + "Now holding " + MainHand + " in both hands. 1 RAP spent (" + CurRoundAP + " RAP remaining)."]
+};
+{
+    [if (matches(OffHand, ".*2H")), code: {
+        [Drop = if(substring(OffHand,0,length(OffHand)-3) == MainHand, 0, 1)]
+        [if (Drop): Result = "Dropping " + OffHand + ".<br>"]
+        [OffHand = "Fist"]
+    };
+    {}]
+    [Result = Result + "Now holding " + MainHand + " in main hand. 1 RAP spent (" + CurRoundAP + " RAP remaining)."]
+}]
+-->
+[r: Result]
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Gain
+[de.lib.TestOwnership()]
+[abort(input(
+    "junk|<html><b>Enter Stat Adjustments:</b></html>|-|LABEL|SPAN=TRUE",
+    "StaminaGain|0|Stamina Gain",
+    "FocusGain|0|Focus Gain",
+    "FatigueGain|0|Fatigue Gain",
+    "AuraGain|0|Aura Gain",
+    "LifeGain|0|Life Gain",
+    "junk2|<html><b>Enter New Temp Values:</b></html>|-|LABEL|SPAN=TRUE",
+    "NewTempStamina|0|Temp Stamina",
+    "NewTempFocus|0|Temp Focus",
+    "NewTempFatigue|0|Temp Fatigue",
+    "NewTempAura|0|Temp Aura",
+    "junk3|<html><b>Enter Action Point Gains:</b></html>|-|LABEL|SPAN=TRUE",
+    "NewRAP|0|Round AP",
+    "NewDAP|0|Daily AP",
+    "NewSAP|0|Spell AP",
+    "NewHero|0|Hero Point"
+))]
+[OldStamina = CurStamina]
+[OldFocus = CurFocus]
+[OldFatigue = CurFatigue]
+[OldAura = CurAura]
+[OldLife = CurLife]
+-- Can't go over maximum, or current value if it happens to be over maximum
+[CurMaxStamina = max(CurStamina, MaxStamina)]
+[CurMaxFocus = max(CurFocus, MaxFocus)]
+[CurMaxFatigue = max(CurFatigue, MaxFatigue)]
+[CurMaxAura = max(CurAura, MaxAura)]
+[CurStamina = min(CurStamina + StaminaGain, CurMaxStamina)]
+[CurFocus = min(CurFocus + FocusGain, CurMaxFocus)]
+[CurFatigue = min(CurFatigue + FatigueGain, CurMaxFatigue)]
+[CurAura = min(CurAura + AuraGain, CurMaxAura)]
+[CurLife = CurLife + LifeGain]
+[CurLife = if (CurLife > MaxLife, MaxLife, CurLife)]
+[OldTempStamina = TempStamina]
+[OldTempFocus = TempFocus]
+[OldTempFatigue = TempFatigue]
+[OldTempAura = TempAura]
+[TempStamina = max(TempStamina, NewTempStamina)]
+[TempFocus = max(TempFocus, NewTempFocus)]
+[TempFatigue = max(TempFatigue, NewTempFatigue)]
+[TempAura = max(TempAura, NewTempAura)]
+[OldRAP = CurRoundAP]
+[OldAP = CurAP]
+[OldSAP = CurSpellAP]
+[OldHeroPoints = HeroPoints]
+[CurRoundAP = CurRoundAP + NewRAP]
+[CurAP = CurAP + NewDAP]
+[CurSpellAP = CurSpellAP + NewSAP]
+[HeroPoints = HeroPoints + NewHero]
+
+[Output = ""]
+[Output = if (CurStamina != OldStamina, Output + "New Stamina is " + CurStamina +".<br>", Output)]
+[Output = if (CurFocus != OldFocus, Output + "New Focus is " + CurFocus +".<br>", Output)]
+[Output = if (CurFatigue != OldFatigue, Output + "New Fatigue is " + CurFatigue +".<br>", Output)]
+[Output = if (CurAura != OldAura, Output + "New Aura is " + CurAura +".<br>", Output)]
+[Output = if (CurLife != OldLife, Output + "New Life is " + CurLife +".<br>", Output)]
+[Output = if (TempStamina != OldTempStamina, Output + "New Temp Stamina is " + TempStamina +".<br>", Output)]
+[Output = if (TempFocus != OldTempFocus, Output + "New Temp Focus is " + TempFocus +".<br>", Output)]
+[Output = if (TempFatigue != OldTempFatigue, Output + "New Temp Fatigue is " + TempFatigue +".<br>", Output)]
+[Output = if (TempAura != OldTempAura, Output + "New Temp Aura is " + TempAura +".<br>", Output)]
+[Output = if (CurRoundAP != OldRAP, Output + "New Round Action Points are " + CurRoundAP +".<br>", Output)]
+[Output = if (CurAP != OldAP, Output + "New Daily Action Points are " + CurAP +".<br>", Output)]
+[Output = if (CurSpellAP != OldSAP, Output + "New Spell Action Points are " + CurSpellAP +".<br>", Output)]
+[Output = if (HeroPoints != OldHeroPoints, Output + "New Hero Points are " + HeroPoints +".<br>", Output)]
+[Output = if (Output == "", "No stat was updated.<br>", Output)]
+-->
+[r:Output]
+
+------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Init Character
+[de.lib.TestOwnership()]
+-- Use current stats, but if empty set to 10
+[BodyTypes = de.lib.GetBodyTypeNames()]
+[Strength = if (Strength == "", 10, Strength)]
+[Dexterity = if (Dexterity == "", 10, Dexterity)]
+[Constitution = if (Constitution == "", 10, Constitution)]
+[Intelligence = if (Intelligence == "", 10, Intelligence)]
+[Wisdom = if (Wisdom == "", 10, Wisdom)]
+[Charisma = if (Charisma == "", 10, Charisma)]
+[BodyType = if (BodyType == "", "Humanoid", BodyType)]
+[BodySelect = json.indexOf(BodyTypes, BodyType)]
+[abort(input("junk|<html><b>Do you wish to inialize this character? <br></html>|-|LABEL|SPAN=TRUE","Strength|"+Strength,"Dexterity|"+Dexterity,"Constitution|"+Constitution,"Intelligence|"+Intelligence,"Wisdom|"+Wisdom,"Charisma|"+Charisma, "BodyType|"+json.toList(BodyTypes)+"|Body Type|LIST|SELECT="+BodySelect+" VALUE=STRING"))]
+[de.lib.FillNewToken()]
+[Reflex = if (Reflex == "", de.lib.Mod(Dexterity), Reflex)]
+[Dodge = if (Dodge == "", 10 + Reflex, Dodge)]
+[Fortitude = if (Fortitude == "", de.lib.Mod(Constitution), Fortitude)]
+[Will = if (Will == "", de.lib.Mod(Intelligence), Will)]
+[Bravery = if (Bravery == "", de.lib.Mod(Wisdom), Bravery)]
+[Luck = if (Luck == "", 0, Luck)]
+[Sanity = if (Sanity == "", de.lib.Mod(Charisma), Sanity)]
+[Move = if (Move == "", 6, Move)]
+[InitBonus = if (InitBonus == "", de.lib.Mod(Dexterity), InitBonus)]
+[abort(input("junk|<html><b>Any changes to secondary stats? <br></html>|-|LABEL|SPAN=TRUE","CoreStamina|"+CoreStamina,"CoreFocus|"+CoreFocus,"CoreFatigue|"+CoreFatigue,"CoreAura|"+CoreAura,"CoreAP|"+CoreAP,"CoreSpellAP|"+CoreSpellAP,"CoreLife|"+CoreLife,"Dodge|"+Dodge,"Reflex|"+Reflex,"Fortitude|"+Fortitude,"Will|"+Will,"Bravery|"+Bravery,"Luck|"+Luck,"Sanity|"+Sanity,"InitBonus|"+InitBonus,"Move|"+Move))]
+[MaxLife = CoreLife]
+[CurLife = MaxLife]
+[Acrobatics = if( Acrobatics == "", 0, Acrobatics)]
+[Athletics = if( Athletics == "", 0, Athletics)]
+[Diplomacy = if( Diplomacy == "", 0, Diplomacy)]
+[Dungeoneering = if( Dungeoneering == "", 0, Dungeoneering)]
+[HighSociety = if( HighSociety == "", 0, HighSociety)]
+[Insight = if( Insight == "", 0, Insight)]
+[Intimidate = if( Intimidate == "", 0, Intimidate)]
+[Lore = if( Lore == "", 0, Lore)]
+[Medical = if( Medical == "", 0, Medical)]
+[Nature = if( Nature == "", 0, Nature)]
+[Perception = if( Perception == "", 0, Perception)]
+[Stealth = if( Stealth == "", 0, Stealth)]
+[Streetwise = if( Streetwise == "", 0, Streetwise)]
+[Thievery = if( Thievery == "", 0, Thievery)]
+[abort(input("junk|<html><b>Input skill levels WITHOUT stat bonuses included. <br></html>|-|LABEL|SPAN=TRUE","Acrobatics|"+Acrobatics,"Athletics|"+Athletics,"Diplomacy|"+Diplomacy,"Dungeoneering|"+Dungeoneering,"HighSociety|"+HighSociety,"Insight|"+Insight,"Intimidate|"+Intimidate,"Lore|"+Lore,"Medical|"+Medical,"Nature|"+Nature,"Perception|"+Perception,"Stealth|"+Stealth,"Streetwise|"+Streetwise,"Thievery|"+Thievery))]
+[SkillAxe = if (SkillAxe == "", 1, SkillAxe)]
+[SkillBash = if (SkillBash == "", 1, SkillBash)]
+[SkillBow = if (SkillBow == "", 1, SkillBow)]
+[SkillChained = if (SkillChained == "", 1, SkillChained)]
+[SkillCrossbow = if (SkillCrossbow == "", 1, SkillCrossbow)]
+[SkillFinesse = if (SkillFinesse == "", 1, SkillFinesse)]
+[SkillLight = if (SkillLight == "", 1, SkillLight)]
+[SkillPolearm = if (SkillPolearm == "", 1, SkillPolearm)]
+[SkillShield = if (SkillShield == "", 1, SkillShield)]
+[SkillSword = if (SkillSword == "", 1, SkillSword)]
+[SkillThrown = if (SkillThrown == "", 1, SkillThrown)]
+[input("junk|<html><b>Fill in weapon skills<br></html>|-|LABEL|SPAN=TRUE","SkillAxe|"+SkillAxe,"SkillBash|"+SkillBash,"SkillBow|"+SkillBow,"SkillChained|"+SkillChained,"SkillCrossbow|"+SkillCrossbow,"SkillFinesse|"+SkillFinesse,"SkillLight|"+SkillLight,"SkillPolearm|"+SkillPolearm,"SkillShield|"+SkillShield,"SkillSword|"+SkillSword,"SkillThrown|"+SkillThrown)]
+[SkillMusic = if (SkillMusic == "", 0, SkillMusic)]
+[SkillCommand = if (SkillCommand == "", 0, SkillCommand)]
+[SkillHoly = if (SkillHoly == "", 0, SkillHoly)]
+[SkillUnholy = if (SkillUnholy == "", 0, SkillUnholy)]
+[SkillElemental = if (SkillElemental == "", 0, SkillElemental)]
+[SkillBlack = if (SkillBlack == "", 0, SkillBlack)]
+[SkillWhite = if (SkillWhite == "", 0, SkillWhite)]
+[SkillMind = if (SkillMind == "", 0, SkillMind)]
+[SkillPlanes = if (SkillPlanes == "", 0, SkillPlanes)]
+[input("junk|<html><b>Input spells levels WITHOUT stat bonuses included.<br></html>|-|LABEL|SPAN=TRUE","SkillMusic|"+SkillMusic,"SkillCommand|"+SkillCommand,"SkillHoly|"+SkillHoly,"SkillUnholy|"+SkillUnholy,"SkillElemental|"+SkillElemental,"SkillBlack|"+SkillBlack,"SkillWhite|"+SkillWhite,"SkillMind|"+SkillMind,"SkillPlanes|"+SkillPlanes)]
+[MACRO("Assign Expertise@CAMPAIGN"):0]
+[MACRO("Assign Weapons@CAMPAIGN"):0]
+[MACRO("Rest Full@CAMPAIGN"):0]
+-->
+Initialized.
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+

@@ -1,0 +1,147 @@
+<!-- Library: AssignArmor
+
+-- Get list of armor locations
+[ArmorLocs = de.lib.GetBodyLocs(BodyType)]
+
+-- Make sure character has a json armor list
+[Armor = if(json.isEmpty(Armor), "{}", Armor)]
+
+-- Build input form advanced
+[inputStr = "[]"]
+[inputStr = json.append(inputStr,"junk|<html><b>Enter Armor Values:</b></html>|-|LABEL|SPAN=TRUE")]
+[for(i,0,json.length(ArmorLocs),1), code: {
+    -- Check if this is a valid weapon to choose
+    [ArmorLoc = json.get(ArmorLocs, i)]
+    
+    -- Look up character armor value for this entry
+    [ArmorVal = json.get(Armor, ArmorLoc)]
+    [ArmorVal = if (ArmorVal == "", 0, ArmorVal)]
+    [h: inputStr = json.append(inputStr,strformat("Armor%{i}|%{ArmorVal}|<html>%{ArmorLoc}</font></html>|TEXT"))]
+}]
+
+-- put local variables in input form
+[inputStr = json.evaluate(inputStr)]
+
+-- get user input
+[abort(input(json.toList(inputStr,"##")))]
+
+-- Clear out the Armor set to get rid of obsolete values on when armor names change
+[Armor = "{}"]
+
+-- Write armor values back
+[for(i,0,json.length(ArmorLocs),1), code: {
+    [Command = "ArmorVal = Armor"+i]
+    [eval(Command)]
+    [Armor = json.set(Armor, json.get(ArmorLocs, i), ArmorVal)]
+}]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Library: EditExtras
+
+-- Build input form advanced
+[Properties = "[]"]
+[inputStr = "[]"]
+[inputStr = json.append(inputStr,"junk|<html><b>Enter Property Values:</b></html>|-|LABEL|SPAN=TRUE")]
+[i=0]
+[foreach(Property,Extras),code:
+{
+    [Properties = json.append(Properties, Property)]
+    [PropertyValue = json.get(Extras,Property)]
+    [inputStr = json.append(inputStr,strformat("Property%{i}|%{PropertyValue}|<html>%{Property}</html>|TEXT"))]
+    [i = i + 1]
+}]
+
+-- put local variables in input form
+[inputStr = json.evaluate(inputStr)]
+
+-- get user input
+[abort(input(json.toList(inputStr,"##")))]
+
+-- Write property values back
+[for(i,0,json.length(Properties),1), code: {
+    [Property = json.get(Properties, i)]
+    [pause("Property")]
+    [Command = "PropertyVal = Property"+i]
+    [eval(Command)]
+    [if (PropertyVal == ""), code: {
+        [Extras = json.remove(Extras, Property)]
+    };
+    {
+        [Extras = json.set(Extras, Property, PropertyVal)]
+    }]
+}]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Library: AddExtras
+
+-- Build input form advanced
+[abort(input("junk|<html><b>Add a new extra property:</b><br></html>|-|LABEL|SPAN=TRUE","Property","Value"))]
+[if (Property == "" || Value == ""), code: {
+    [Result = "<font color=red><b>Both entries require input.</b><font>"]
+};{
+    [Extras = json.set(Extras, Property, Value)] 
+    [Result = "Extra Property " + Property + " is set to " + Value]
+}]
+-->
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Library: Fill New Token
+[CarriedWeapons = if(json.isEmpty(CarriedWeapons), "[]", CarriedWeapons)]
+[Expertise = if(json.isEmpty(Expertise), "[]", Expertise)]
+[Stance = "None"]
+[de.lib.ClearStanceScratchpad()]
+[LifeMinusStartsAt = if (LifeMinusStartsAt == "", 10, LifeMinusStartsAt)]
+[CoreStamina = if (CoreStamina == "", Constitution, CoreStamina)]
+[CoreFocus = if (CoreFocus == "", Intelligence, CoreFocus)]
+[CoreFatigue = if (CoreFatigue == "", Wisdom, CoreFatigue)]
+[CoreAura = if (CoreAura == "", Charisma, CoreAura)]
+[CoreRoundAP = if (CoreRoundAP == "", 8, CoreRoundAP)]
+[CoreAP = if (CoreAP == "", 5, CoreAP)]
+[CoreSpellAP = if (CoreSpellAP == "", 0, CoreSpellAP)]
+[CoreLife = if (CoreLife == "", 10 + de.lib.Mod(Strength), CoreLife)]
+[MaxLife = CoreLife]
+[CurLife = MaxLife]
+[Extras = if (json.isEmpty(Extras), "{}", Extras)]
+[Holdables = if (json.isEmpty(Holdables), "{}", Holdables)]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Library: AddHoldable
+
+-- Build input form advanced
+[abort(input("junk|<html><b>Add a new object that can be held.:</b><br></html>|-|LABEL|SPAN=TRUE","Item"))]
+[if (Item == ""), code: {
+    [Result = "<font color=red><b>An object name is required.</b><font>"]
+};{
+    [Holdables = json.append(Holdables, Item)] 
+    [Result = "New object " + Item + " has been added to the holdable item list."]
+}]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Library: Clear Secondary Stats
+[CoreStamina = ""]
+[CoreFocus = ""]
+[CoreFatigue = ""]
+[CoreAura = ""]
+[CoreRoundAP = ""]
+[CoreAP = ""]
+[CoreSpellAP = ""]
+[CoreLife = ""]
+[LifeMinusStartsAt = ""]
+[Reflex = ""]
+[Dodge = ""]
+[Fortitude = ""]
+[Will = ""]
+[Bravery = ""]
+[Luck = ""]
+[Sanity = ""]
+[Move = ""]
+[InitBonus = ""]
+-->
+
+
