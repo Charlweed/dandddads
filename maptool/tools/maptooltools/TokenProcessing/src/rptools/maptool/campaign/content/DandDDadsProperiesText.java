@@ -21,6 +21,7 @@ package rptools.maptool.campaign.content;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nu.xom.Builder;
@@ -36,9 +37,20 @@ import nu.xom.ValidityException;
 public class DandDDadsProperiesText {
 
     private static final Logger LOG = Logger.getLogger(DandDDadsProperiesText.class.getName());
-    public static final Path DEFAULT_NPC_CIVILIAN_FILE = Paths.get(System.getProperty("user.dir", ""), "danddads_properties_npc_civilian.xml");
+    public static final Path DEFAULT_NPC_CIVILIAN_FILE;
     private Document _xomDocument = null;
     private final Path _replacementXMLSourceFile;
+
+    static {
+        Path defaultNPCCivilianFile = Paths.get(System.getProperty("user.dir", ""), "danddads_properties_npc_civilian.xml");
+        String osName = System.getProperty("os.name").toLowerCase(Locale.US);
+        String userName = System.getProperty("user.name").toLowerCase(Locale.US);
+        if (userName.contains("hymes")) {
+            Path authorPrefix = Paths.get(System.getProperty("user.home"), "projects", "hymerfania");
+            defaultNPCCivilianFile = Paths.get(authorPrefix.toString(), "MapToolTools", "TokenProcessing", "src", "rptools", "maptool", "campaign", "content", "danddads_properties_npc_civilian.xml");
+        }
+        DEFAULT_NPC_CIVILIAN_FILE = defaultNPCCivilianFile;
+    }
 
     public DandDDadsProperiesText(Path replacementXMLSourceFile) throws ParsingException, ValidityException, IOException {
         _replacementXMLSourceFile = replacementXMLSourceFile;

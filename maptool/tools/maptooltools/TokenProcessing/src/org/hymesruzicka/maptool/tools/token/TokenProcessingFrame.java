@@ -18,12 +18,17 @@
  */
 package org.hymesruzicka.maptool.tools.token;
 
+import java.awt.Color;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.hymesruzicka.maptool.tools.ZipWrangler;
 import static rptools.maptool.campaign.content.DandDDadsProperiesText.DEFAULT_NPC_CIVILIAN_FILE;
@@ -35,6 +40,7 @@ import static rptools.maptool.campaign.content.DandDDadsProperiesText.DEFAULT_NP
 public class TokenProcessingFrame extends javax.swing.JFrame {
 
     private static final Logger LOG = Logger.getLogger(TokenProcessingFrame.class.getName());
+    private static final String DEST_BOX_NAME = "destinationDir";
 
     /**
      * Creates new form TokenProcessingFrame
@@ -49,8 +55,14 @@ public class TokenProcessingFrame extends javax.swing.JFrame {
          */
         sourcejTextField.setText(ZipWrangler.CAMPAIGN_ORIGIONAL_DIR_NAME);
         replacementjTextField.setText(DEFAULT_NPC_CIVILIAN_FILE.toString());
-        destinationjTextField.setText(ZipWrangler.WORK_DIR_NAME);
+        destinationjTextField.setText(ZipWrangler.XML_PROCESSED_DIR_NAME);
+        FocusListener checker = new FileNameFieldFocusListener();
+        sourcejTextField.addFocusListener(checker);
+        replacementjTextField.addFocusListener(checker);
+        destinationjTextField.addFocusListener(checker);
+        destinationjTextField.setName(DEST_BOX_NAME);
         resultjTextField.setVisible(false);
+        checkAll();
         setEnabledAll(true);
         return this;
     }
@@ -138,9 +150,17 @@ public class TokenProcessingFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sourcejLabel)
+                            .addComponent(destinationjLabel))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(replacementjLabel)
+                        .addGap(332, 332, 332))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(resultjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(resultjTextField)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(commencejButton))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -149,20 +169,12 @@ public class TokenProcessingFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(chooseSourcejButton)
-                                    .addComponent(chooseDestinationjButton))))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sourcejLabel)
-                            .addComponent(destinationjLabel))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(replacementjTextField)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chooseReplacementjButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(replacementjLabel)
-                        .addGap(332, 332, 332))))
+                                    .addComponent(chooseDestinationjButton)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(replacementjTextField)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chooseReplacementjButton)))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -196,6 +208,7 @@ public class TokenProcessingFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void chooseSourcejButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseSourcejButtonActionPerformed
+        checkAll();
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Zip & Campaign files", "zip", "cmpgn");
@@ -207,9 +220,11 @@ public class TokenProcessingFrame extends javax.swing.JFrame {
             LOG.log(Level.INFO, "Source for campaign data = {0}", chooser.getSelectedFile().getName());
             sourcejTextField.setText(chooser.getSelectedFile().toString());
         }
+        checkAll();
     }//GEN-LAST:event_chooseSourcejButtonActionPerformed
 
     private void chooseDestinationjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseDestinationjButtonActionPerformed
+        checkAll();
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setCurrentDirectory(new java.io.File(destinationjTextField.getText()));
@@ -218,9 +233,11 @@ public class TokenProcessingFrame extends javax.swing.JFrame {
             LOG.log(Level.INFO, "Destination for campaign file = {0}", chooser.getSelectedFile().getName());
             destinationjTextField.setText(chooser.getSelectedFile().toString());
         }
+        checkAll();
     }//GEN-LAST:event_chooseDestinationjButtonActionPerformed
 
     private void commencejButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commencejButtonActionPerformed
+        checkAll();
         TokenWorker worker = new TokenWorker(this, sourcejTextField.getText(), replacementjTextField.getText(), destinationjTextField.getText());
         LOG.log(Level.FINE, "Button pushed.");
         worker.addPropertyChangeListener(listener -> putOut(worker));
@@ -230,6 +247,7 @@ public class TokenProcessingFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_commencejButtonActionPerformed
 
     private void chooseReplacementjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseReplacementjButtonActionPerformed
+        checkAll();
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Replacement XML file", "xml");
@@ -241,6 +259,7 @@ public class TokenProcessingFrame extends javax.swing.JFrame {
             LOG.log(Level.INFO, "Source for XML replacement data = {0}", chooser.getSelectedFile().getName());
             replacementjTextField.setText(chooser.getSelectedFile().toString());
         }
+        checkAll();
     }//GEN-LAST:event_chooseReplacementjButtonActionPerformed
 
     private void setEnabledAll(boolean value) {
@@ -251,6 +270,36 @@ public class TokenProcessingFrame extends javax.swing.JFrame {
         destinationjTextField.setEnabled(value);
         replacementjTextField.setEnabled(value);
         sourcejTextField.setEnabled(value);
+    }
+
+    private final void checkField(JTextField textBox) {
+        String boxName = textBox.getName();
+        if (boxName != null && DEST_BOX_NAME.equals(boxName)) {
+            checkField(textBox, true);
+        } else {
+            checkField(textBox, false);
+        }
+    }
+
+    private final void checkField(JTextField textBox, boolean checkParent) {
+        Path file = Paths.get(textBox.getText());
+        boolean exists;
+        if (checkParent) {
+            exists = Files.exists(file.getParent());
+        } else {
+            exists = Files.exists(file);
+        }
+        if (exists) {
+            textBox.setBorder(javax.swing.BorderFactory.createEtchedBorder(new java.awt.Color(51, 255, 0), new java.awt.Color(0, 204, 51)));
+        } else {
+            textBox.setBorder(javax.swing.BorderFactory.createEtchedBorder(Color.RED, Color.PINK));
+        }
+    }
+
+    private final void checkAll() {
+        checkField(sourcejTextField);
+        checkField(replacementjTextField);
+        checkField(destinationjTextField, true);
     }
 
     /**
@@ -303,6 +352,20 @@ public class TokenProcessingFrame extends javax.swing.JFrame {
             revalidate();
             repaint();
         }
+    }
+
+    private class FileNameFieldFocusListener implements FocusListener {
+
+        @Override
+        public void focusGained(FocusEvent focusEvent) {
+            checkField((JTextField) focusEvent.getSource());
+        }
+
+        @Override
+        public void focusLost(FocusEvent focusEvent) {
+            checkField((JTextField) focusEvent.getSource());
+        }
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
