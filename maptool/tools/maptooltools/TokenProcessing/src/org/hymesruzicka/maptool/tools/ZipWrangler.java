@@ -46,9 +46,9 @@ public class ZipWrangler {
 
     private static final Logger LOG = Logger.getLogger(ZipWrangler.class.getName());
 
-    public static final String WORK_DIR_NAME =  Paths.get(System.getProperty("user.home", ""), ".Documents").toString();
+    public static final String WORK_DIR_NAME =  Paths.get(System.getProperty("user.home", ""), "Documents").toString();
     public static final String CAMPAIGN_ORIGIONAL_DIR_NAME = Paths.get(System.getProperty("user.home", ""), ".maptool", "backup","danddads.cmpgn").toString();
-    public static final String XML_PROCESSED_DIR_NAME = Paths.get(System.getProperty("user.home", ""), ".Documents").toString();
+    public static final String XML_PROCESSED_DIR_NAME = Paths.get(System.getProperty("user.home", ""), "Documents").toString();
     public static final String SQUISHME_DIR_NAME = "danddads_processed";
     public static final List<String> OBSOLETE_FILES;
     public static final String REPLACEMENT_FILES_GLOB_STRING = "content_*\\.xml";
@@ -117,12 +117,8 @@ public class ZipWrangler {
         File file = new File(zipFileName);
 
         ZipFile javaZipFile = new ZipFile(file);
-//        Path newPath = Paths.get(destDir.toString(), zipFileName.substring(0, zipFileName.length() - 4));
         Path newPath = destDir.normalize();
         boolean mkdir = newPath.toFile().mkdir();
-//        if (!mkdir) {
-//            throw new IOException("failed to created " + newPath);
-//        }
         Enumeration<? extends ZipEntry> zipFileEntries = javaZipFile.entries();
 
         // Process each entry
@@ -136,9 +132,6 @@ public class ZipWrangler {
 
             // create the parent directory structure if needed
             boolean mkdirs = destinationParent.mkdirs();
-//            if (!mkdirs) {
-//                throw new IOException("failed to created " + destinationParent.toString());
-//            }
             if (!entry.isDirectory()) {
                 try (BufferedInputStream is = new BufferedInputStream(javaZipFile.getInputStream(entry))) {
                     int currentByte;
