@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import static org.hymesruzicka.maptool.tools.Shelf.BUFFER_SIZE;
 
 /**
  *
@@ -40,7 +41,6 @@ import java.util.zip.ZipOutputStream;
 public class ZippingVisitor extends SimpleFileVisitor<Path> implements java.lang.AutoCloseable {
 
     private static final Logger LOG = Logger.getLogger(ZippingVisitor.class.getName());
-    public static final int BUFFER_SIZE = 4096;
 
     public static void zipWalking(Path source, Path target) {
         try (ZippingVisitor zippingVisitor = new ZippingVisitor(source, target)) {

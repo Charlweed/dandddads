@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
@@ -29,8 +31,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import nu.xom.ParsingException;
+import static org.hymesruzicka.maptool.tools.MapToolZipType.isMapToolZip;
 import org.hymesruzicka.maptool.tools.ReplacementPair;
-import static org.hymesruzicka.maptool.tools.ZipWrangler.ORIGINAL_FILENAME;
+import static org.hymesruzicka.maptool.tools.Shelf.DEFAULT_CONTENT_XML_FILENAME;
 import static org.hymesruzicka.maptool.tools.ZipWrangler.extractZipFolder;
 import static org.hymesruzicka.maptool.tools.ZipWrangler.replace;
 
@@ -42,19 +45,48 @@ public class TokenWorker extends SwingWorker<String, Void> {
 
     private static final Logger LOG = Logger.getLogger(TokenWorker.class.getName());
 
+    public static Path validateFile(String sourceFileName) throws IOException {
+        if (sourceFileName.isEmpty()) {
+            throw new IllegalArgumentException("Source filename cannot be empty.");
+        }
+        LOG.log(Level.FINER, sourceFileName);
+        Path result = Paths.get(sourceFileName);
+        if (!Files.exists(result)) {
+            throw new IOException("Could not find file or directory " + sourceFileName);
+        }
+        LOG.log(Level.FINER, " source file {0} exists.", sourceFileName);
+        if (Files.isRegularFile(result)) {
+            boolean isZip = sourceFileName.endsWith("zip")
+                    || isMapToolZip(sourceFileName)
+                    || sourceFileName.endsWith("jar");
+            if (!isZip) {
+                throw new UnsupportedOperationException("Only Directories and Zips please.");
+            }
+            Path tmpDir = Files.createTempDirectory("tokenProcessorExtractionDir");
+            extractZipFolder(sourceFileName, tmpDir);
+            result = tmpDir;
+        }
+        LOG.log(Level.FINER, " source file {0} is a regular file .", sourceFileName);
+        return result;
+    }
+
     private String _sourceFileName;
-    private final String _replacementFileName;
+    private final String _propertiesXMLFileName;
+    private final String _macrosXMLFileName;
     private final String _destDirName;
     private Path _outFile;
     private final TokenProcessingFrame _mainFrame;
     private Dialog _dialog;
+    private final List<TokenProcessing.TokenProcess> _processSelectionList = new ArrayList<>();
 
-    public TokenWorker(TokenProcessingFrame mainFrame, String sourceDirName, String replacementFileName, String destDirName) {
+    public TokenWorker(TokenProcessingFrame mainFrame, String sourceDirName, String propertiesXMLFileName, String macrosXMLFileName, String destDirName, List<TokenProcessing.TokenProcess> processSelectionList) {
         this._mainFrame = mainFrame;
         this._sourceFileName = sourceDirName;
-        this._replacementFileName = replacementFileName;
+        this._propertiesXMLFileName = propertiesXMLFileName;
+        this._macrosXMLFileName = macrosXMLFileName;
         this._destDirName = destDirName;
         this._outFile = null;
+        this._processSelectionList.addAll(processSelectionList);
     }
 
     @Override
@@ -72,11 +104,10 @@ public class TokenWorker extends SwingWorker<String, Void> {
             LOG.log(Level.FINER, " source file {0} exists.", getSourceFileName());
             if (Files.isRegularFile(sourceFile)) {
                 boolean isZip = getSourceFileName().endsWith("zip")
-                        || getSourceFileName().endsWith("cmpgn")
-                        || getSourceFileName().endsWith("rptok")
+                        || isMapToolZip(getSourceFileName())
                         || getSourceFileName().endsWith("jar");
                 if (!isZip) {
-                    throw new UnsupportedOperationException("Only Directories and Zips please/");
+                    throw new UnsupportedOperationException("Only Directories and Zips please.");
                 }
                 Path tmpDir = Files.createTempDirectory("tokenProcessorExtractionDir");
                 extractZipFolder(getSourceFileName(), tmpDir);
@@ -84,24 +115,48 @@ public class TokenWorker extends SwingWorker<String, Void> {
                 setSourceFileName(tmpDir.toString());
             }
             LOG.log(Level.FINER, " source file {0} is a regular file .", getSourceFileName());
-            Path replacementFile = Paths.get(getReplacementFileName());
-            LOG.log(Level.FINER, "{0} is replacement file name.", getReplacementFileName());
-            if (!Files.exists(replacementFile)) {
-                throw new IOException("Could not find file " + getReplacementFileName());
+            /*properties*/
+            Path propertiesXMLFile = Paths.get(getPropertiesXMLFileName());
+            LOG.log(Level.FINER, "{0} is propertiesXML file name.", getPropertiesXMLFileName());
+            if (!Files.exists(propertiesXMLFile)) {
+                throw new IOException("Could not find file " + getPropertiesXMLFileName());
             }
-            LOG.log(Level.FINER, "replacement file {0} exists.", getReplacementFileName());
-            if (!Files.isRegularFile(replacementFile)) {
-                throw new IOException("File \"" + getReplacementFileName() + "\" is not a regular file.");
+            LOG.log(Level.FINER, "propertiesXML file {0} exists.", getPropertiesXMLFileName());
+            if (!Files.isRegularFile(propertiesXMLFile)) {
+                throw new IOException("File \"" + getPropertiesXMLFileName() + "\" is not a regular file.");
             }
-            LOG.log(Level.FINER, "{0} is a regular file.", getReplacementFileName());
-            Path contentXMLFile = Paths.get(sourceFile.toString(), ORIGINAL_FILENAME);
-            LOG.log(Level.FINE, "contentXMLFile = {0}, replacementXMLFile={1}", new String[]{contentXMLFile.toString(), replacementFile.toString()});
-            TokenProcessing tokenProcessor = new TokenProcessing(contentXMLFile.toString(), replacementFile.toString());
-            tokenProcessor.setDestDirName(getDestDirName());
-            tokenProcessor.process();
+            LOG.log(Level.FINER, "{0} is a regular file.", getPropertiesXMLFileName());
+            /*macros*/
+            Path macrosXMLFile = Paths.get(getMacrosXMLFileName());
+            LOG.log(Level.INFO, "{0} is macrosXML file name.", getMacrosXMLFileName());
+            if (!Files.exists(macrosXMLFile)) {
+                throw new IOException("Could not find file " + getMacrosXMLFileName());
+            }
+            LOG.log(Level.INFO, "macrosXMLFile file {0} exists.", getMacrosXMLFileName());
+            if (!Files.isRegularFile(macrosXMLFile)) {
+                throw new IOException("File \"" + getMacrosXMLFileName() + "\" is not a regular file.");
+            }
+            LOG.log(Level.INFO, "{0} is a regular file.", getMacrosXMLFileName());
+            /*unprocessed*/
+            Path contentXMLFile = Paths.get(sourceFile.toString(), DEFAULT_CONTENT_XML_FILENAME);
+            LOG.log(Level.FINE,
+                    "contentXMLFile = {0}, propertiesXMLFile={1}, macrosXMLFile={2}",
+                    new String[]{contentXMLFile.toString(),
+                        propertiesXMLFile.toString(),
+                        macrosXMLFile.toString()});
+
+            TokenProcessing tokenProcessor
+                    = new TokenProcessing(contentXMLFile.toString(),
+                            propertiesXMLFile.toString(),
+                            macrosXMLFile.toString());
+
+            tokenProcessor.process(_processSelectionList);
             ReplacementPair pair = new ReplacementPair(contentXMLFile, tokenProcessor.getProcessedFile());
             setOutFile(replace(pair, getSourceFileName(), getDestDirName()));
-        } catch (IllegalArgumentException | IOException | UnsupportedOperationException | ParsingException anException) {
+        } catch (IllegalArgumentException
+                | IOException
+                | UnsupportedOperationException
+                | ParsingException anException) {
             LOG.log(Level.SEVERE, null, anException);
         }
         String result = null;
@@ -109,7 +164,6 @@ public class TokenWorker extends SwingWorker<String, Void> {
             result = getOutFile().toAbsolutePath().toString();
             System.out.println(result);
         }
-
         return result;
     }
 
@@ -132,10 +186,17 @@ public class TokenWorker extends SwingWorker<String, Void> {
     }
 
     /**
-     * @return the _replacementFileName
+     * @return the _propertiesXMLFileName
      */
-    public String getReplacementFileName() {
-        return _replacementFileName;
+    public String getPropertiesXMLFileName() {
+        return _propertiesXMLFileName;
+    }
+
+    /**
+     * @return the _propertiesXMLFileName
+     */
+    public String getMacrosXMLFileName() {
+        return _macrosXMLFileName;
     }
 
     private void setOutFile(Path result) {

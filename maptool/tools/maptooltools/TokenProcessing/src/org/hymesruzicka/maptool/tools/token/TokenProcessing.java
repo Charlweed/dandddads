@@ -24,16 +24,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import nu.xom.Element;
-import nu.xom.Elements;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
 import org.hymesruzicka.maptool.synthetic.TokenElementDelegate;
-import org.hymesruzicka.maptool.tools.CampaignXOM;
+import org.hymesruzicka.maptool.tools.MapToolXOM;
+import org.hymesruzicka.maptool.tools.Shelf;
+import static org.hymesruzicka.maptool.tools.Shelf.PROCESSED_POSTFIX;
+import static org.hymesruzicka.maptool.tools.Shelf.PROCESSED_PREFIX;
+import static org.hymesruzicka.maptool.tools.Shelf.PROPERTY_NAME_BASIC;
+import static org.hymesruzicka.maptool.tools.Shelf.PROPERTY_NAME_CHARACTER;
+import static org.hymesruzicka.maptool.tools.Shelf.PROPERTY_NAME_NPC;
+import static org.hymesruzicka.maptool.tools.Shelf.TOKEN_NODE_NAME;
+import static org.hymesruzicka.maptool.tools.Utility.elementsByName;
+import static org.hymesruzicka.maptool.tools.token.TokenProcessing.TokenProcess.REPLACE_PROPERTY_SET;
+import rptools.maptool.campaign.content.DandDDadsMacroSetTokenNPCText;
 import rptools.maptool.campaign.content.DandDDadsProperiesText;
 
 /**
@@ -43,68 +53,31 @@ import rptools.maptool.campaign.content.DandDDadsProperiesText;
 public class TokenProcessing {
 
     private static final Logger LOG = Logger.getLogger(TokenProcessing.class.getName());
-    private static final DandDDadsProperiesText DEFAULT_REPLACEMENT_SOURCE;
 
-    /**
-     * The name of the MapTool XML Element "Token"
-     */
-    public static final String TOKEN_NODE_NAME = "net.rptools.maptool.model.Token";
-
-    /**
-     * The name of the DandDDads propertyType "Character"
-     */
-    public static final String PROPERTY_NAME_CHARACTER = "Character";
-
-    /**
-     * The name of the DandDDads propertyType "NPC"
-     */
-    public static final String PROPERTY_NAME_NPC = "NPC";
-
-    /**
-     * The name of the MapTool propertyType "Basic"
-     */
-    public static final String PROPERTY_NAME_BASIC = "Basic";
-    private static final String PROPERTY_NAME_MARKER = "Marker";
-    private static final String PROPERTY_NAMES_DANDDDADS[] = {PROPERTY_NAME_CHARACTER, PROPERTY_NAME_NPC};
-    private static final String PROPERTY_NAME_STOCK[] = {PROPERTY_NAME_BASIC, PROPERTY_NAME_MARKER};
-
-    /**
-     * Prefix for processed file name
-     */
-    public static final String PROCESSED_PREFIX = "content_";
-
-    /**
-     * Postfix a.k.a Suffix for processed file name
-     */
-    public static final String PROCESSED_POSTFIX = ".xml";
-
-    static {
-        DandDDadsProperiesText source = null;
-        try {
-            source = new DandDDadsProperiesText(DandDDadsProperiesText.DEFAULT_NPC_CIVILIAN_FILE);
-        } catch (ParsingException | IOException ex) {
-            LOG.log(Level.SEVERE, null, ex);
+    /*Could be equals, but I may upgreade this later.*/
+    private static boolean isModifyTarget(String propertyTypeName) {
+        boolean result = false;
+        switch (propertyTypeName) {
+            case PROPERTY_NAME_BASIC: {
+                result = true;
+                break;
+            }
+            case PROPERTY_NAME_CHARACTER:
+            case PROPERTY_NAME_NPC: {
+                break;
+            }
+            default: {
+                LOG.log(Level.WARNING, "unrecognized propertyType {0} ", new String[]{propertyTypeName});
+                break;
+            }
         }
-        DEFAULT_REPLACEMENT_SOURCE = source;
+        return result;
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        TokenProcessing tokenProcessor;
-        try {
-            tokenProcessor = new TokenProcessing(null, null);
-            tokenProcessor.process();
-        } catch (ParsingException | IOException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private final DandDDadsProperiesText _replacementSource;
-    private String _destDirName = "";
-    private Path _destDirPath = Paths.get(_destDirName);
-    private CampaignXOM _campaignXOM;
+    private DandDDadsProperiesText _replacementSource;
+    private DandDDadsMacroSetTokenNPCText _macroSetSource;
+    private Path _destDirPath = Paths.get(Shelf.WORK_DIR_NAME_DEFAULT);
+    private MapToolXOM _campaignXOM;
     private Path _processedFile = null;
 
     /**
@@ -113,41 +86,48 @@ public class TokenProcessing {
      *
      * @param originalXMLFileName The MapTool XML file to modify.
      * @param replacementXMLFileName The source of the replacement XML content.
+     * @param macroSetXMLFileName The source of the macroSet XML content.
      * @throws nu.xom.ParsingException
      * @throws IOException
      *
      */
-    public TokenProcessing(String originalXMLFileName, String replacementXMLFileName) throws ParsingException, IOException {
-        DandDDadsProperiesText replacementSource = null;
-        if (replacementXMLFileName != null && !replacementXMLFileName.isEmpty()) {
-            Path replacementSourceFile = Paths.get(replacementXMLFileName);
-            if (!Files.exists(replacementSourceFile)) {
-                throw new IOException("Could not find" + replacementXMLFileName);
-            }
-            replacementSource = new DandDDadsProperiesText(replacementSourceFile);
-        } else {
-            replacementSource = DEFAULT_REPLACEMENT_SOURCE;
-        }
-        _replacementSource = replacementSource;
-
+    public TokenProcessing(String originalXMLFileName, String replacementXMLFileName, String macroSetXMLFileName) throws ParsingException, IOException {
+        readRelacementPropertiesSource(replacementXMLFileName);
         if (getReplacementSource() == null) {
             throw new ParsingException("Replacement source not loaded.");
         }
+
+        readMacrosetSource(macroSetXMLFileName);
+        if (getMacroSetSource() == null) {
+            throw new ParsingException("macroSet source not loaded.");
+        }
+
         if (originalXMLFileName != null && !originalXMLFileName.isEmpty()) {
-            _campaignXOM = new CampaignXOM(originalXMLFileName);
+            _campaignXOM = new MapToolXOM(originalXMLFileName);
         } else {
-            _campaignXOM = new CampaignXOM();
+            _campaignXOM = new MapToolXOM();
         }
     }
 
     /**
-     * Getter for the replacementSource property, as set during construction. This
-     * object provides an instance of the XOM document of the replacement XML.
+     * Getter for the replacementSource property, as set during construction.
+     * This object provides an instance of the XOM document of the replacement
+     * XML.
      *
-     * @return replacementSource value. 
+     * @return replacementSource value.
      */
     public final DandDDadsProperiesText getReplacementSource() {
         return _replacementSource;
+    }
+
+    /**
+     * Getter for the macroSetSource property, as set during construction. This
+     * object provides an instance of the XOM document of the macroSet XML.
+     *
+     * @return macroSetSource value.
+     */
+    public final DandDDadsMacroSetTokenNPCText getMacroSetSource() {
+        return _macroSetSource;
     }
 
     /**
@@ -164,26 +144,8 @@ public class TokenProcessing {
      *
      * @param destDirPath new value of _destDirPath
      */
-    public void setDestDirPath(Path destDirPath) {
+    public final void setDestDirPath(Path destDirPath) {
         this._destDirPath = destDirPath;
-    }
-
-    /**
-     * Get the value of _destDirName
-     *
-     * @return the value of _destDirName
-     */
-    public String getDestDirName() {
-        return _destDirName;
-    }
-
-    /**
-     * Set the value of _destDirName
-     *
-     * @param destDirName new value of _destDirName
-     */
-    public void setDestDirName(String destDirName) {
-        this._destDirName = destDirName;
     }
 
     /**
@@ -191,7 +153,7 @@ public class TokenProcessing {
      *
      * @return
      */
-    private final CampaignXOM getCampaignXOM() {
+    private final MapToolXOM getCampaignXOM() {
         return _campaignXOM;
     }
 
@@ -207,8 +169,9 @@ public class TokenProcessing {
      * <p>
      * If that Token has a child Element "propertyType" with a value of "Basic",
      * then any existing "propertyMapCI" Element is replaced.</p><p>
+     * @param processList the value of processEnum
      */
-    public void process() {
+    public void process(List<TokenProcessing.TokenProcess> processList) {
         TokenElementDelegate campaignToken;
         for (Element tokenElement : getTokenElements()) {
             campaignToken = new TokenElementDelegate(tokenElement);
@@ -218,72 +181,119 @@ public class TokenProcessing {
                     && tokenName != null
                     && (!tokenName.isEmpty())
                     && (!tokenName.contains("Lib:"))) {
-
-                String propertyTypeName = campaignToken.getPropertyType();
-                switch (propertyTypeName) {
-                    case PROPERTY_NAME_BASIC: {
-                        replace(campaignToken);
-                        break;
+                if (isModifyTarget(campaignToken.getPropertyType())) {
+                    for (TokenProcess currentProcess : processList) {
+                        switch (currentProcess) {
+                            case REPLACE_PROPERTY_SET:
+                                LOG.log(Level.FINE, "Performing {0} on \"{1}\"", new String[]{currentProcess.toString(), tokenName});
+                                replaceTokenProperties(campaignToken);
+                                break;
+                            case REPLACE_MACRO_SET:
+                                LOG.log(Level.FINE, "Performing {0} on \"{1}\"", new String[]{currentProcess.toString(), tokenName});
+                                replaceTokenMacros(campaignToken);
+                                break;
+                            default:
+                                throw new AssertionError(currentProcess.name());
+                        }
                     }
-                    case PROPERTY_NAME_CHARACTER:
-                    case PROPERTY_NAME_NPC: {
-                        LOG.log(Level.FINE, "ignoring {0}", new Object[]{tokenName});
-                        break;
-                    }
-                    default: {
-                        LOG.log(Level.WARNING, "unrecognized propertyType {0} in {1}", new Object[]{propertyTypeName, tokenName});
-                        break;
-                    }
+                    assignTokenPropertyType(campaignToken, PROPERTY_NAME_NPC);
                 }
             }
         }
-
-        StringBuilder freshName = new StringBuilder(PROCESSED_PREFIX);
-        Long now = new Timestamp(System.currentTimeMillis()).getTime();//Yeah, redundant.
-        String nowString = Long.toString(now);
-        freshName.append(nowString);
-        freshName.append(PROCESSED_POSTFIX);
-        setProcessedFile(getDestDirPath().resolve(freshName.toString()));
-        try (FileOutputStream destOutputStream = new FileOutputStream(getProcessedFile().toFile())) {
-            Serializer outputter = new Serializer(destOutputStream);
-            outputter.setIndent(4);
-            outputter.write(getCampaignXOM().getXomDocument());
+        try {
+            if (Files.exists(getDestDirPath())) {
+                if (!Files.isDirectory(getDestDirPath())) {
+                    throw new IOException("Existing " + getDestDirPath().toString() + " is not a directory.");
+                }
+            } else {
+                boolean mkdirs = getDestDirPath().toFile().mkdirs(); //test return value later.
+            }
+            StringBuilder freshName = new StringBuilder(PROCESSED_PREFIX);
+            Long now = new Timestamp(System.currentTimeMillis()).getTime();//Yeah, redundant.
+            String nowString = Long.toString(now);
+            freshName.append(nowString);
+            freshName.append(PROCESSED_POSTFIX);
+            setProcessedFile(getDestDirPath().resolve(freshName.toString()));
+            /*Surprised that failure to write here does not throw exception.*/
+            try (FileOutputStream destOutputStream = new FileOutputStream(getProcessedFile().toFile())) {
+                Serializer outputter = new Serializer(destOutputStream);
+                outputter.setIndent(4);
+                outputter.write(getCampaignXOM().getXomDocument());
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            }
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
     }
 
     /**
+     * Assigns the propertyTypeName to the provided TokenElementDelegate.
+     *
+     * @param campaignToken The TokenElementDelegate who's value will be
+     * changed.
+     * @param propertyTypeName The propertyTypeName value, I.E. Basic "NPC",
+     * "Charater", etc.
+     * @return The same TokenElementDelegate that was provided.
+     */
+    public TokenElementDelegate assignTokenPropertyType(TokenElementDelegate campaignToken, String propertyTypeName) {
+        String tokenName = campaignToken.getName();
+        LOG.log(Level.FINE, "Attempting to set \"propertyType\" of {0} to {1}", new String[]{tokenName, propertyTypeName});
+        campaignToken.setPropertyType(propertyTypeName);
+        campaignToken.readAll();
+        if (!propertyTypeName.equals(campaignToken.getPropertyType())) {
+            LOG.log(Level.SEVERE, " \"propertyType\" of {0} is now  {1}", new String[]{tokenName, campaignToken.getPropertyType()});
+        }
+        return campaignToken;
+    }
+
+    /**
      * <p>
      * The replacement is obtained from the <code>getPropertyMapCIElement</code>
-     * method of a <code>DandDDadsProperiesText</code> instance, and that XML
-     * currently has the properties of an unarmed civilian NPC.</p>
+     * method of a <code>DandDDadsProperiesText</code> instance.</p>
      *
      * @param campaignToken The token whose propertyMapCI XML Element will be
      * replaced.
      * @return The replacement propertyMapCI XML Element.
      */
-    protected Element replace(TokenElementDelegate campaignToken) {
+    protected Element replaceTokenProperties(TokenElementDelegate campaignToken) {
         String tokenName = campaignToken.getName();
         LOG.log(Level.FINE, "replacing propertyMapCI Element of {0}", new Object[]{tokenName});
         Element tokenXMLElement = campaignToken.getSourceElement();
         Element propertyMapCIElement_basic = campaignToken.getPropertyMapCIElement();
-        Element propertyMapCIElement_civilian = getReplacementSource().getPropertyMapCIElement();
         int childPos = tokenXMLElement.indexOf(propertyMapCIElement_basic);
         if (childPos < 0) {
-            throw new IllegalStateException("Could not correctly determine position of propertyMapCIElement_basic in " + tokenName);
+            throw new IllegalStateException("Could not correctly determine position of propertyMapCIElement in " + tokenName);
         }
         tokenXMLElement.removeChild(propertyMapCIElement_basic);
+        Element propertyMapCIElement_civilian = getReplacementSource().getPropertyMapCIElement();
         tokenXMLElement.insertChild(propertyMapCIElement_civilian, childPos);
-        LOG.log(Level.FINE, "Attempting to set \"propertyType\" of {0} to {1}", new String[]{tokenName, PROPERTY_NAME_NPC});
-        campaignToken.setPropertyType(PROPERTY_NAME_NPC);
         campaignToken.readAll();
-        LOG.finer(campaignToken.getPropertyMapCI());
-        LOG.log(Level.FINE, " \"propertyType\" of {0} is now  {1}", new String[]{tokenName, campaignToken.getPropertyType()});
-        if (!PROPERTY_NAME_NPC.equals(campaignToken.getPropertyType())) {
-            LOG.log(Level.SEVERE, " \"propertyType\" of {0} is now  {1}", new String[]{tokenName, campaignToken.getPropertyType()});
-        }
         return propertyMapCIElement_civilian;
+    }
+
+    /**
+     * <p>
+     * The replacement is obtained from the <code>getMacroPropertiesMap</code>
+     * method of a <code>DandDDadsMacroSetTokenNPCText</code> instance.</p>
+     *
+     * @param campaignToken The token that gets the insertion.
+     * @return The fresh MacroSetElement XML Element.
+     */
+    protected Element replaceTokenMacros(TokenElementDelegate campaignToken) {
+        String tokenName = campaignToken.getName();
+        LOG.log(Level.FINE, "inserting macroSetElement Element into {0}", new String[]{tokenName});
+        Element tokenXMLElement = campaignToken.getSourceElement();
+        Element macrosElement_empty = campaignToken.getMacroPropertiesMapElement();
+        int childPos = tokenXMLElement.indexOf(macrosElement_empty);
+        if (childPos < 0) {
+            throw new IllegalStateException("Could not correctly determine position of macroPropertiesMapElement in " + tokenName);
+        }
+        tokenXMLElement.removeChild(macrosElement_empty);
+        Element macroPropertiesMapElement = getMacroSetSource().getMacroPropertiesMap();
+        tokenXMLElement.insertChild(macroPropertiesMapElement, childPos);
+        campaignToken.readAll();
+        return macroPropertiesMapElement;
     }
 
     /**
@@ -294,44 +304,22 @@ public class TokenProcessing {
      * @return
      */
     public final List<Element> getTokenElements() {
-        List<Element> result;
         if (getCampaignXOM().getXomDocument() == null) {
             getCampaignXOM().build();
         }
         if (getCampaignXOM().getXomDocument() == null) {
             throw new IllegalStateException("Failed to build Campaign XML Document from " + getCampaignXOM().getInputFilePath().toString());
         }
-        result = new ArrayList<>();
-        Element current = getCampaignXOM().getXomDocument().getRootElement();
-        getTokenElements(result, current, 1);
-        return result;
-    }
-
-    private List<Element> getTokenElements(List<Element> resultIn, Element current, int depth) {
-        if (TOKEN_NODE_NAME.equalsIgnoreCase(current.getLocalName())) {
-            LOG.log(Level.FINE, "{0}", current.getQualifiedName());
-            resultIn.add(current);
-        } else {
-            LOG.log(Level.FINER, "{0}", current.getQualifiedName());
-        }
-        Elements childElements = current.getChildElements();
-        if (childElements.size() > 0) {
-            int size = childElements.size();
-            LOG.log(Level.FINER, "{0} has {1} children.", new Object[]{current.getQualifiedName(), Integer.toString(size)});
-            for (int i = 0; i < size; i++) {
-                Element child = childElements.get(i);
-                getTokenElements(resultIn, child, depth + 1);
-            }
-        } else {
-            LOG.log(Level.FINER, "No child nodes in {0}", current.getQualifiedName());
-        }
-        return resultIn;
+        Element root = getCampaignXOM().getXomDocument().getRootElement();
+        return elementsByName(root, TOKEN_NODE_NAME);
     }
 
     /**
-     * Getter for processedFile property. After calling process, this property
+     * Getter for processedFile property.After calling process, this property
      * contains the file generated by <code>process</code>. If it is still null
      * after calling <code>process</code>, there was an error during processing.
+     *
+     * @return The processedFile
      */
     public final Path getProcessedFile() {
         return this._processedFile;
@@ -342,6 +330,42 @@ public class TokenProcessing {
      */
     private void setProcessedFile(Path processedFile) {
         this._processedFile = processedFile;
+    }
+
+    private void readRelacementPropertiesSource(String replacementXMLFileName) throws IOException, ParsingException {
+        DandDDadsProperiesText replacementSource;
+        if (replacementXMLFileName == null || replacementXMLFileName.isEmpty()) {
+            throw new IllegalArgumentException("replacementXMLFileName cannot be null nor empty.");
+        }
+        Path replacementSourceFile = Paths.get(replacementXMLFileName);
+        if (!Files.exists(replacementSourceFile)) {
+            throw new IOException("Could not find" + replacementXMLFileName);
+        }
+        replacementSource = new DandDDadsProperiesText(replacementSourceFile);
+
+        _replacementSource = replacementSource;
+    }
+
+    private void readMacrosetSource(String macroSetXMLFileName) throws IOException, ParsingException {
+        DandDDadsMacroSetTokenNPCText macroSetSource;
+        if (macroSetXMLFileName == null || macroSetXMLFileName.isEmpty()) {
+            throw new IllegalArgumentException("macroSetXMLFileName cannot be null nor empty.");
+        }
+
+        Path macroSetSourceFile = Paths.get(macroSetXMLFileName);
+        if (!Files.exists(macroSetSourceFile)) {
+            throw new IOException("Could not find" + macroSetXMLFileName);
+        }
+        macroSetSource = new DandDDadsMacroSetTokenNPCText(macroSetSourceFile);
+
+        _macroSetSource = macroSetSource;
+    }
+
+    public static enum TokenProcess {
+        REPLACE_PROPERTY_SET, REPLACE_MACRO_SET;
+        public static final List<TokenProcess> PROPERTIES = Collections.unmodifiableList(Arrays.asList(new TokenProcess[]{REPLACE_PROPERTY_SET}));
+        public static final List<TokenProcess> MACROS = Collections.unmodifiableList(Arrays.asList(new TokenProcess[]{REPLACE_MACRO_SET}));
+        public static final List<TokenProcess> ALL_PROCESSES = Collections.unmodifiableList(Arrays.asList(values()));
     }
 
 }

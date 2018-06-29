@@ -191,14 +191,6 @@ MA 02110-1301  USA
             </net.rptools.CaseInsensitiveHashMap_-KeyValue>
         </entry>
         <entry>
-            <string>mainhand</string>
-            <net.rptools.CaseInsensitiveHashMap_-KeyValue>
-                <key>MainHand</key>
-                <value class="string">Longsword</value>
-                <outer-class reference="../../../.."/>
-            </net.rptools.CaseInsensitiveHashMap_-KeyValue>
-        </entry>
-        <entry>
             <string>maxstamina</string>
             <net.rptools.CaseInsensitiveHashMap_-KeyValue>
                 <key>MaxStamina</key>

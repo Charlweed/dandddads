@@ -26,10 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -37,6 +34,13 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import static org.hymesruzicka.maptool.tools.CopyingVisitor.copyWalking;
 import static org.hymesruzicka.maptool.tools.DeletionVisitor.deleteWalking;
+import static org.hymesruzicka.maptool.tools.MapToolZipType.isMapToolZip;
+import static org.hymesruzicka.maptool.tools.Shelf.BUFFER_SIZE;
+import static org.hymesruzicka.maptool.tools.Shelf.DEFAULT_ZIP_FILE_NAME;
+import static org.hymesruzicka.maptool.tools.Shelf.MAPTOOL_INPUT_FILE_DIR_NAME;
+import static org.hymesruzicka.maptool.tools.Shelf.OBSOLETE_FILES;
+import static org.hymesruzicka.maptool.tools.Shelf.SQUISHME_DIR_NAME;
+import static org.hymesruzicka.maptool.tools.Shelf.WORK_DIR_NAME_DEFAULT;
 import static org.hymesruzicka.maptool.tools.ZippingVisitor.zipWalking;
 
 /**
@@ -47,65 +51,15 @@ public class ZipWrangler {
 
     private static final Logger LOG = Logger.getLogger(ZipWrangler.class.getName());
 
-    public static final String WORK_DIR_NAME;
-    public static final String CAMPAIGN_ORIGIONAL_DIR_NAME;
-    public static final String XML_PROCESSED_DIR_NAME;
-    public static final String SQUISHME_DIR_NAME = "danddads_processed";
-    public static final List<String> OBSOLETE_FILES;
-    public static final String REPLACEMENT_FILES_GLOB_STRING = "content_*\\.xml";
-    public static final String ORIGINAL_FILENAME = "content.xml";
-    public static final Path ORIGINAL_FILE;
-    public static final String DEFAULT_ZIP_FILE_NAME = "dnddads.cmpgn";
-    public static final int BUFFER_SIZE = 4096;
-
-    static {
-        String workDirName = Paths.get(System.getProperty("user.home", ""), "Documents","maptool_work").toString();
-        String campaignOrigionalDirName = Paths.get(System.getProperty("user.home", ""), ".maptool", "backup", "danddads.cmpgn").toString();
-        String xml_processedDirName = Paths.get(System.getProperty("user.home", ""), "Documents","token_processor").toString();
-        String osName = System.getProperty("os.name").toLowerCase(Locale.US);
-        String userName = System.getProperty("user.name").toLowerCase(Locale.US);;
-        if (osName.contains("win")) {
-            if (userName.contains("hymes")) {
-                workDirName = Paths.get("R:", userName, "TEMP", "maptool_work").toString();
-                campaignOrigionalDirName = Paths.get(System.getProperty("user.home", ""), "projects", "hymerfania", "dandddads_garage", "DummyApplication", "src", "brine_and_venom_compilation_hackme").toString();
-                xml_processedDirName = Paths.get("R:", userName, "TEMP", "token_processor").toString();
-            }
-        }
-        if (osName.contains("nix")) {
-            workDirName = Paths.get(System.getProperty("java.io.tmpdir"), "maptool_work").toString();
-            campaignOrigionalDirName = Paths.get(System.getProperty("user.home", ""), ".maptool", "backup", "danddads.cmpgn").toString();
-            xml_processedDirName = Paths.get(System.getProperty("java.io.tmpdir"), "token_processor").toString();
-            if (userName.contains("hymes")) {
-                campaignOrigionalDirName = Paths.get(System.getProperty("user.home", ""), "projects", "hymerfania", "dandddads_garage", "DummyApplication", "src", "brine_and_venom_compilation_hackme").toString();
-            }
-        }
-        if (osName.contains("mac")) {
-            workDirName = Paths.get(System.getProperty("java.io.tmpdir"), "maptool_work").toString();
-            campaignOrigionalDirName = Paths.get(System.getProperty("user.home", ""), ".maptool", "backup", "danddads.cmpgn").toString();
-            xml_processedDirName = Paths.get(System.getProperty("java.io.tmpdir"), "token_processor").toString();
-            if (userName.contains("hymes")) {
-                campaignOrigionalDirName = Paths.get(System.getProperty("user.home", ""), "projects", "hymerfania", "dandddads_garage", "DummyApplication", "src", "brine_and_venom_compilation_hackme").toString();
-            }
-        }
-        
-        WORK_DIR_NAME = workDirName;
-        CAMPAIGN_ORIGIONAL_DIR_NAME = campaignOrigionalDirName;
-        XML_PROCESSED_DIR_NAME = xml_processedDirName;
-
-        String[] doomed = new String[]{"content.xml", "*.dtd"};
-        OBSOLETE_FILES = Arrays.asList(doomed);
-        ORIGINAL_FILE = Paths.get(CAMPAIGN_ORIGIONAL_DIR_NAME, ORIGINAL_FILENAME);
-    }
-
     public static Path replace(ReplacementPair pair, String cmpgnOrigionalDirNameIn, String workDirNameIn) {
         String cmpgnOrigionalDirName, workDirName;
         if (cmpgnOrigionalDirNameIn == null || cmpgnOrigionalDirNameIn.isEmpty()) {
-            cmpgnOrigionalDirName = CAMPAIGN_ORIGIONAL_DIR_NAME;
+            cmpgnOrigionalDirName = MAPTOOL_INPUT_FILE_DIR_NAME;
         } else {
             cmpgnOrigionalDirName = cmpgnOrigionalDirNameIn;
         }
         if (workDirNameIn == null || workDirNameIn.isEmpty()) {
-            workDirName = WORK_DIR_NAME;
+            workDirName = WORK_DIR_NAME_DEFAULT;
         } else {
             workDirName = workDirNameIn;
         }
@@ -176,12 +130,15 @@ public class ZipWrangler {
                     }
                 }
             }
-            if (currentEntry.endsWith(".zip") || currentEntry.endsWith(".cmpgn") || currentEntry.endsWith(".rptok")) {
+            if (isMapToolZip(currentEntry)) {
                 // found a zip file, try to open
                 extractZipFolder(destFile.getAbsolutePath(), destFile.getAbsoluteFile().toPath());
             }
         }
 
+    }
+
+    private ZipWrangler() {
     }
 
 }
