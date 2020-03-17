@@ -1,3 +1,49 @@
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Start Encounter
+[de.lib.TestOwnership()]
+[MainHandSelect = 0]
+[for(i,0,json.length(CarriedWeapons),1), code: {
+    [Weapon = json.get(CarriedWeapons, i)]
+    [if (Weapon == MainHand): MainHandSelect = i]
+}]
+[OffhandWeapons = "[]"]
+[OffHandSelect = 0]
+[for(i,0,json.length(CarriedWeapons),1), code: {
+    [Weapon = json.get(CarriedWeapons, i)]
+    [if (Weapon == OffHand): OffhandSelect = i]
+    [IsOffHand = de.lib.LookupWeaponStat(Weapon,"Offhand")]
+    [ if (IsOffHand == 1): OffhandWeapons = json.append(OffhandWeapons,Weapon)]
+}]
+[status=abort(input(
+     "MainHand|"+json.toList(CarriedWeapons)+"|Main Weapon|LIST|SELECT=" + MainHandSelect + " VALUE=STRING",
+     "OffHand|"+json.toList(OffhandWeapons)+"|Offhand Weapon|LIST|SELECT=" + OffhandSelect + " VALUE=STRING"
+))]
+[Result = ""]
+[if (de.lib.LookupWeaponStat(MainHand,"TwoHands") == 2), code: {
+    [Drop = if((OffHand != "Fist") && (matches(OffHand, ".*2H") == 0), 1, 0)]
+    [if (Drop): Result = "Dropping " + OffHand + " to hold two handed.<br>"]
+    [OffHand = MainHand]
+};
+{
+    [if (de.lib.LookupWeaponStat(OffHand,"TwoHands") == 2), code: {
+        [OffHand = "Fist"]
+    };
+    {}]  
+}]
+
+[Result = Result + "Now holding " + MainHand + " in main hand, " + OffHand + " in off hand."]
+-->
+[MACRO("Roll Initiative@CAMPAIGN"):0]
+[MACRO("Rest Quick@CAMPAIGN"):0]
+<!--
+[CurSpellAP = MaxSpellAP]
+[Result = "<br>" + Result + "<br> Current Stance is " + Stance +"."]
+-->
+[r: Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
 <!-- Draw Offhand
 [de.lib.TestOwnership()]
 [de.lib.ExpendRAP(1,0)]
@@ -16,7 +62,7 @@
 -- Removed two handed main hand --
 [Result = ""]
 [ if (matches(MainHand, ".*2H")), code: {
-    [MainHand = substring(MainHand,0,length(OffHand)-3)]
+    [MainHand = substring(MainHand,0,length(MainHand)-3)]
     [Result = "Switching two handed grip on " + MainHand + " to single hand.<br>"]
 };
 {
@@ -32,6 +78,9 @@
 [r: Result] Now holding [MainHand] / [OffHand]. 1 RAP spent ([CurRoundAP] RAP remaining).
 
 ------------------------------------------------------------------------------------------------------------------------
+--[if (matches(MainHand, ".*2H")), code: {
+--    [if (matches(OffHand, ".*2H")), code: {
+
 
 <!-- Draw Weapon
 [de.lib.TestOwnership()]
@@ -43,14 +92,14 @@
 ))]
 [Result = ""]
 -- Check if weapon is two handed. --
-[if (matches(MainHand, ".*2H")), code: {
+[if (de.lib.LookupWeaponStat(MainHand,"TwoHands") == 2), code: {
     [Drop = if((OffHand != "Fist") && (matches(OffHand, ".*2H") == 0), 1, 0)]
     [if (Drop): Result = "Dropping " + OffHand + " to hold two handed.<br>"]
     [OffHand = MainHand]
     [Result = Result + "Now holding " + MainHand + " in both hands. 1 RAP spent (" + CurRoundAP + " RAP remaining)."]
 };
 {
-    [if (matches(OffHand, ".*2H")), code: {
+    [if (de.lib.LookupWeaponStat(OffHand,"TwoHands") == 2), code: {
         [Drop = if(substring(OffHand,0,length(OffHand)-3) == MainHand, 0, 1)]
         [if (Drop): Result = "Dropping " + OffHand + ".<br>"]
         [OffHand = "Fist"]
@@ -68,14 +117,12 @@
     "junk|<html><b>Enter Stat Adjustments:</b></html>|-|LABEL|SPAN=TRUE",
     "StaminaGain|0|Stamina Gain",
     "FocusGain|0|Focus Gain",
-    "FatigueGain|0|Fatigue Gain",
-    "AuraGain|0|Aura Gain",
+    "MojoGain|0|Mojo Gain",
     "LifeGain|0|Life Gain",
     "junk2|<html><b>Enter New Temp Values:</b></html>|-|LABEL|SPAN=TRUE",
     "NewTempStamina|0|Temp Stamina",
     "NewTempFocus|0|Temp Focus",
-    "NewTempFatigue|0|Temp Fatigue",
-    "NewTempAura|0|Temp Aura",
+    "NewTempMojo|0|Temp Mojo",
     "junk3|<html><b>Enter Action Point Gains:</b></html>|-|LABEL|SPAN=TRUE",
     "NewRAP|0|Round AP",
     "NewDAP|0|Daily AP",
@@ -84,28 +131,23 @@
 ))]
 [OldStamina = CurStamina]
 [OldFocus = CurFocus]
-[OldFatigue = CurFatigue]
-[OldAura = CurAura]
+[OldMojo = CurMojo]
 [OldLife = CurLife]
 -- Can't go over maximum, or current value if it happens to be over maximum
 [CurMaxStamina = max(CurStamina, MaxStamina)]
 [CurMaxFocus = max(CurFocus, MaxFocus)]
-[CurMaxFatigue = max(CurFatigue, MaxFatigue)]
-[CurMaxAura = max(CurAura, MaxAura)]
+[CurMaxMojo = max(CurMojo, MaxMojo)]
 [CurStamina = min(CurStamina + StaminaGain, CurMaxStamina)]
 [CurFocus = min(CurFocus + FocusGain, CurMaxFocus)]
-[CurFatigue = min(CurFatigue + FatigueGain, CurMaxFatigue)]
-[CurAura = min(CurAura + AuraGain, CurMaxAura)]
+[CurMojo = min(CurMojo + MojoGain, CurMaxMojo)]
 [CurLife = CurLife + LifeGain]
 [CurLife = if (CurLife > MaxLife, MaxLife, CurLife)]
 [OldTempStamina = TempStamina]
 [OldTempFocus = TempFocus]
-[OldTempFatigue = TempFatigue]
-[OldTempAura = TempAura]
+[OldTempMojo = TempMojo]
 [TempStamina = max(TempStamina, NewTempStamina)]
 [TempFocus = max(TempFocus, NewTempFocus)]
-[TempFatigue = max(TempFatigue, NewTempFatigue)]
-[TempAura = max(TempAura, NewTempAura)]
+[TempMojo = max(TempMojo, NewTempMojo)]
 [OldRAP = CurRoundAP]
 [OldAP = CurAP]
 [OldSAP = CurSpellAP]
@@ -118,13 +160,11 @@
 [Output = ""]
 [Output = if (CurStamina != OldStamina, Output + "New Stamina is " + CurStamina +".<br>", Output)]
 [Output = if (CurFocus != OldFocus, Output + "New Focus is " + CurFocus +".<br>", Output)]
-[Output = if (CurFatigue != OldFatigue, Output + "New Fatigue is " + CurFatigue +".<br>", Output)]
-[Output = if (CurAura != OldAura, Output + "New Aura is " + CurAura +".<br>", Output)]
+[Output = if (CurMojo != OldMojo, Output + "New Mojo is " + CurMojo +".<br>", Output)]
 [Output = if (CurLife != OldLife, Output + "New Life is " + CurLife +".<br>", Output)]
 [Output = if (TempStamina != OldTempStamina, Output + "New Temp Stamina is " + TempStamina +".<br>", Output)]
 [Output = if (TempFocus != OldTempFocus, Output + "New Temp Focus is " + TempFocus +".<br>", Output)]
-[Output = if (TempFatigue != OldTempFatigue, Output + "New Temp Fatigue is " + TempFatigue +".<br>", Output)]
-[Output = if (TempAura != OldTempAura, Output + "New Temp Aura is " + TempAura +".<br>", Output)]
+[Output = if (TempMojo != OldTempMojo, Output + "New Temp Mojo is " + TempMojo +".<br>", Output)]
 [Output = if (CurRoundAP != OldRAP, Output + "New Round Action Points are " + CurRoundAP +".<br>", Output)]
 [Output = if (CurAP != OldAP, Output + "New Daily Action Points are " + CurAP +".<br>", Output)]
 [Output = if (CurSpellAP != OldSAP, Output + "New Spell Action Points are " + CurSpellAP +".<br>", Output)]
@@ -162,7 +202,7 @@
 [Sanity = if (Sanity == "", de.lib.Mod(Charisma), Sanity)]
 [Move = if (Move == "", 6, Move)]
 [InitBonus = if (InitBonus == "", de.lib.Mod(Dexterity), InitBonus)]
-[abort(input("junk|<html><b>Any changes to secondary stats? <br></html>|-|LABEL|SPAN=TRUE","CoreStamina|"+CoreStamina,"CoreFocus|"+CoreFocus,"CoreFatigue|"+CoreFatigue,"CoreAura|"+CoreAura,"CoreAP|"+CoreAP,"CoreSpellAP|"+CoreSpellAP,"CoreLife|"+CoreLife,"Dodge|"+Dodge,"Reflex|"+Reflex,"Fortitude|"+Fortitude,"Will|"+Will,"Bravery|"+Bravery,"Luck|"+Luck,"Sanity|"+Sanity,"InitBonus|"+InitBonus,"Move|"+Move))]
+[abort(input("junk|<html><b>Any changes to secondary stats? <br></html>|-|LABEL|SPAN=TRUE","CoreStamina|"+CoreStamina,"CoreFocus|"+CoreFocus,"CoreMojo|"+CoreMojo,"CoreAP|"+CoreAP,"CoreSpellAP|"+CoreSpellAP,"CoreLife|"+CoreLife,"Dodge|"+Dodge,"Reflex|"+Reflex,"Fortitude|"+Fortitude,"Will|"+Will,"Bravery|"+Bravery,"Luck|"+Luck,"Sanity|"+Sanity,"InitBonus|"+InitBonus,"Move|"+Move))]
 [MaxLife = CoreLife]
 [CurLife = MaxLife]
 [Acrobatics = if( Acrobatics == "", 0, Acrobatics)]

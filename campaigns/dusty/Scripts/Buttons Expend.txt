@@ -27,8 +27,7 @@ NOT USED YET???
     "junk|<html><b>Enter Stat Amounts Spent:</b></html>|-|LABEL|SPAN=TRUE",
     "StaminaSpent|0|Stamina ("+CurStamina+"/"+TempStamina+") To Expend",
     "FocusSpent|0|Focus ("+CurFocus+"/"+TempFocus+") To Expend",
-    "FatigueSpent|0|Fatigue ("+CurFatigue+"/"+TempFatigue+") To Expend",
-    "AuraSpent|0|Aura ("+CurAura+"/"+TempAura+") To Expend",
+    "MojoSpent|0|Mojo ("+CurMojo+"/"+TempMojo+") To Expend",
     "RAPSpent|0|Round AP ("+CurRoundAP+") To Expend"
 ))]
 [de.lib.ExpendStat("Stamina", StaminaSpent, 1)]
@@ -56,27 +55,16 @@ NOT USED YET???
 {
     [Output2 = Output2 + "<font color=red><b>Not enough Focus.</b></font> Use an Willpower Surge.<br>"]
 }]
-[ExtraFatigue = if (FatigueSpent > CurFatigue + TempFatigue, FatigueSpent - CurFatigue - TempFatigue, 0)]
-[FatigueSpent2 = FatigueSpent - ExtraFatigue]
-[de.lib.ExpendStat("Fatigue", FatigueSpent2, 1)]
-[if (FatigueSpent > 0), code:
+[ExtraMojo = if (MojoSpent > CurMojo + TempMojo, MojoSpent - CurMojo - TempMojo, 0)]
+[MojoSpent2 = MojoSpent - ExtraMojo]
+[de.lib.ExpendStat("Mojo", MojoSpent2, 1)]
+[if (MojoSpent > 0), code:
 {
-    [Output2 = Output2 + "spends " + FatigueSpent2 + " Fatigue leaving " + CurFatigue + " (" + TempFatigue + " temp)<br>"]
+    [Output2 = Output2 + "spends " + MojoSpent2 + " Mojo leaving " + CurMojo + " (" + TempMojo + " temp)<br>"]
 }]
-[if (ExtraFatigue > 0), code:
+[if (ExtraMojo > 0), code:
 {
-  [Output2 = Output2 + "<font color=red><b>extra <font size=+2>" + ExtraFatigue + "</font> Fatigue left over.<br>If this was damage, need to spend Aura or Life.</b></font><br>"]
-}]
-[ExtraAura = if (AuraSpent > CurAura + TempAura, AuraSpent - CurAura - TempAura, 0)]
-[AuraSpent2 = AuraSpent - ExtraAura]
-[de.lib.ExpendStat("Aura", AuraSpent2, 1)]
-[if (AuraSpent > 0), code:
-{
-    [Output2 = Output2 + "spends " + AuraSpent2 + " Aura leaving " + CurAura + " (" + TempAura + " temp)<br>"]
-}]
-[if (ExtraAura > 0), code:
-{
-  [Output2 = Output2 + "<font color=red><b>extra <font size=+2>" + ExtraAura + "</font> Aura left over.<br>If this was damage, need to spend Fatigue or Life.</b></font><br>"]
+  [Output2 = Output2 + "<font color=red><b>extra <font size=+2>" + ExtraMojo + "</font> Mojo left over.<br>If this was damage, need to spend Life.</b></font><br>"]
 }]
 
 [de.lib.ExpendRAP(RAPSpent, 1)]
@@ -97,18 +85,55 @@ NOT USED YET???
 
 <!-- Surge: Action
 [de.lib.TestOwnership()]
-[if(CurAP > 0), code:
+[if((CurAP > 0) || (CurSpellAP > 0)), code:
 {
-    [CurAP = CurAP - 1]
+    [if (CurSpellAP > 0), code:
+    {
+        [CurSpellAP = CurSPellAP - 1]
+    };
+    {
+        [CurAP = CurAP - 1]
+    }]
     [CurRoundAP = CurRoundAP + 2]
-    [Output = "Action Surge: Two RAPs gained. (only once per round). DAP:" + CurAP + ", RAP:" + CurRoundAP]
+    [Output = "Action Surge: Two RAPs gained. (only once per round). DAP:" + CurAP + ", EAP:" + CurSpellAP + ", RAP:" + CurRoundAP]
 };
 {
-  [Output = "<font color=red><b>No Daily AP left for an Action Surge.</b></font>"]
+  [Output = "<font color=red><b>No Daily or Encounter AP left for an Action Surge.</b></font>"]
 }]
 -->
 [r:Output]
 
+------------------------------------------------------------------------------------------------------------------------
+<!-- Surge: Stamina
+[de.lib.TestOwnership()]
+[if(CurMojo > 0  || TempMojo > 0), code:
+{
+    [if (TempMojo > 0): TempMojo = TempMojo - 1; CurMojo = CurMojo - 1]
+    [CurStamina = CurStamina + Constitution]    
+    [Output = "Stamina Surge: Stamina " + CurStamina + ", Mojo " + CurMojo + " (" 
+    + TempMojo + " temp)"]
+};
+{
+  [Output = "No Mojo left for an Stamine Surge."]
+}]
+-->
+[r:Output]
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Surge: Focus
+[de.lib.TestOwnership()]
+[if(CurMojo > 0  || TempMojo > 0), code:
+{
+    [if (TempMojo > 0): TempMojo = TempMojo - 1; CurMojo = CurMojo - 1]
+    [CurFocus = CurFocus + Intelligence]    
+    [Output = "Focus Surge: Focus " + CurFocus + ", Mojo " + CurMojo + " (" 
+    + TempMojo + " temp)"]
+};
+{
+  [Output = "No Mojo left for an Focus Surge."]
+}]
+-->
+[r:Output]
 ------------------------------------------------------------------------------------------------------------------------
 
 <!-- Spend Hero Point
@@ -123,3 +148,69 @@ NOT USED YET???
 }]
 -->
 [r:Output]
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Take Damage
+[de.lib.TestOwnership()]
+[LifeStart = CurLife]
+[abort(input("junk|<html><b>Enter damage taken.</html>|-|LABEL|SPAN=TRUE","ToMojo|0|Mojo:","ToLife|0|Life:"))]
+
+[TempMojoSpent = if (TempMojo > ToMojo, ToMojo, TempMojo)]
+[MojoSpent = if (CurMojo > ToMojo - TempMojoSpent, ToMojo - TempMojoSpent, CurMojo)]
+[LifeOverflow = if (ToMojo > MojoSpent + TempMojoSpent, ToMojo - MojoSpent - TempMojoSpent, 0)]
+[TempMojo = TempMojo - TempMojoSpent]
+[CurMojo = CurMojo - MojoSpent]
+[TotalLife = LifeOverflow + ToLife]
+[CurLife = CurLife - TotalLife]
+[TotalDamage = TempMojoSpent + MojoSpent + TotalLife]
+[Output = "Total Damage Taken:<font color=red size=+2><b>" + TotalDamage]
+
+[Output = Output + "</b></font><br>Mojo Taken:<font color=red>" + MojoSpent + "</font>, Remaining :<font color=green>" + CurMojo]
+[Output = Output + "</font><br>Life Taken:<font color=red>" + TotalLife + "</font>, Remaining:<font color=green><b>" + CurLife + "</b></font"]
+[if (CurLife <= 0 && CurLife > -10 && CurLife != LifeStart), code: {
+    [Output = Output + "</b></font><br><font color=red><b>" + token.name + " is Dying.</b></font>"]
+    [state.Prone = 1]
+    [state.Dying = 1]
+    [Stance = "No Stance"]
+    [de.lib.ClearStanceScratchpad()]
+    [FortRoll = 2d10]
+    [TotalFortRoll = FortRoll + Fortitude]
+    [FortCheck = 10 + TotalDamage]
+    [Output = Output + "<br>Fortitude check <font size=+1 color=blue><b>" + TotalFortRoll + "</b></font> (Roll:" + FortRoll + ", Fort:" + Fortitude + ") vs DC <font size=+1 color=red><b>" + FortCheck + "</b></font> ( Dam:" + TotalDamage + ") :<br>"]
+    [if (TotalFortRoll >= FortCheck), code: {
+        [Output = Output + "<font color=green><b> Success!</b></font>" + token.name + " remains concious."]
+    };
+    {
+        [Output = Output + "<font color=red><b> Failure!</b></font> " + token.name + " loses conciousness."]
+        [state.Unconcious = 1]
+    }]
+};
+{
+}]
+[if (CurLife <= -10), code: {
+    [Output = Output + "</b></font><br><font color=red><b>" + token.name + " is DEAD!</b></font>"]
+    [state.Dead = 1]
+    [Stance = "No Stance"]
+    [de.lib.ClearStanceScratchpad()]
+};
+{
+}]
+-- See if stance and active spells are lost.
+[if (CurLife > 0), code: {
+    [WillRoll = 2d10]
+    [TotalWillRoll = WillRoll + Will]
+    [WillCheck = 10 + TotalDamage]
+    [Output = Output + "<br>Will check <font size=+1 color=blue><b>" + TotalWillRoll + "</b></font> (Roll:" + WillRoll + ", Will:" + Will + ") vs DC <font size=+1 color=red><b>" + WillCheck + "</b></font> ( Dam:" + TotalDamage + ") :<br>"]
+    [if (TotalWillRoll >= WillCheck), code: {
+        [Output = Output + "<font color=green><b> Success!</b></font>"]
+    };
+    {
+        [Output = Output + "<font color=red><b> Failure!</b></font> Stances lost and active spells broken.</font>"]
+        [Stance = "No Stance"]
+        [de.lib.ClearStanceScratchpad()]
+    }]
+};
+{
+}]
+-->
+[Output]

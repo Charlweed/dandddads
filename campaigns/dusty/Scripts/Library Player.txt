@@ -243,6 +243,141 @@
 
 ------------------------------------------------------------------------------------------------------------------------
 
+<!-- RollToParry
+[de.lib.DebugPickAttackerParry()]
+[de.lib.LookupParryID(LastParried)]
+[LastParriedType = macro.return]
+-- Convert non-weapons to "Fists" for easy table lookups without error
+[MainHandIsWeapon = de.lib.IsParryWeapon(MainHand)]
+[MainHandForParry = if(MainHandIsWeapon, MainHand, "Fist")]
+[WeaponType = de.lib.LookupWeaponStat(MainHandForParry, "Type")]
+[MainSkill = eval("Skill" + WeaponType)]
+[MainExpertise = json.contains(Expertise, MainHandForParry)]
+[MainToHitStat = de.lib.LookupWeaponStat(MainHandForParry, "ToHitStat")]
+[MainToHitStat = if (Dexterity > Strength && WeaponType == "Finesse", "Dexterity", MainToHitStat)]
+[MainToHitStat = if (StanceToHitStat == "", MainToHitStat, StanceToHitStat)]
+[MainParryMod = de.lib.LookupParryMod(MainHandForParry,LastParriedType)]
+[MainParryTotal = MainParryMod + MainSkill]
+[OffHandIsWeapon = de.lib.IsParryWeapon(OffHand)]
+[OffHandIsWeapon = if(matches(OffHand, ".*2H"), 0, OffHandIsWeapon)]
+[OffHandForParry = if(OffHandIsWeapon, OffHand, "Fist")]
+[WeaponType = de.lib.LookupWeaponStat(OffHandForParry, "Type")]
+[OffSkill = eval("Skill" + WeaponType)]
+[OffExpertise = json.contains(Expertise, OffHandForParry)]
+[OffToHitStat = de.lib.LookupWeaponStat(OffHandForParry, "ToHitStat")]
+[OffToHitStat = if (Dexterity > Strength && WeaponType == "Finesse", "Dexterity", OffToHitStat)]
+[OffToHitStat = if (StanceToHitStat == "", OffToHitStat, StanceToHitStat)]
+[OffParryMod = de.lib.LookupParryMod(OffHandForParry,LastParriedType)]
+[OffParryTotal = OffParryMod + OffSkill]
+
+[Roll = 2d10]
+[LifeMinus = de.lib.CurrentLifeMinus()]
+[if (OffHandForParry == "Fist" || MainParryTotal >= OffParryTotal), code: {
+    <!-- Main hand is used for parry -->
+    [OtherHandBonus = if (OffHandForParry == "Fist", 0, 1)]
+    [ParryRoll = Roll + MainParryMod + MainSkill + MainExpertise + LifeMinus + StanceParry + OtherHandBonus - ParriesThisRound]
+    
+    [Result = "Parrying with " + MainHand + ": <font color=green size=+2><b>" + ParryRoll + "</b></font><br>"]
+    [Result = Result + "( Roll "+ Roll]
+    [Result = Result + ", vs " + LastParried + ":" + MainParryMod]
+    [Result = if(MainSkill != 0, Result + ", Skill " + MainSkill, Result)]
+    [Result = if(MainExpertise != 0, Result + ", Expertise " + MainExpertise, Result)]
+    [Result = if(LifeMinus != 0, Result + ", LifeMinus " + LifeMinus, Result)]
+    [Result = if(StanceParry != 0, Result + ", StanceBonus " + StanceParry, Result)]
+    [Result = if(OtherHandBonus != 0, Result + ", " + OffHand + ":" + OtherHandBonus, Result)]
+    [Result = if(ParriesThisRound != 0, Result + ", Parries This Round: -" + ParriesThisRound, Result)]
+    [Result = Result + " )<br>"]
+};
+{
+    <!-- Off hand is used for parry -->
+    [OtherHandBonus = if (MainHandForParry == "Fist", 0, 1)]
+    [ParryRoll = Roll + OffParryMod + OffSkill + OffExpertise + LifeMinus + StanceParry + OtherHandBonus - ParriesThisRound]
+    
+    [Result = "Parrying with " + OffHand + ": <font color=green size=+2><b>" + ParryRoll + "</b></font><br>"]
+    [Result = Result + "( Roll "+ Roll]
+    [Result = Result + ", vs " + LastParried + ":" + OffParryMod]
+    [Result = if(OffSkill != 0, Result + ", Skill " + OffSkill, Result)]
+    [Result = if(OffExpertise != 0, Result + ", Expertise " + OffExpertise, Result)]
+    [Result = if(LifeMinus != 0, Result + ", LifeMinus " + LifeMinus, Result)]
+    [Result = if(StanceParry != 0, Result + ", StanceBonus " + StanceParry, Result)]
+    [Result = if(OtherHandBonus != 0, Result + ", " + MainHand + ":" + OtherHandBonus, Result)]
+    [Result = if(ParriesThisRound != 0, Result + ", Parries This Round: -" + ParriesThisRound, Result)]
+    [Result = Result + " )<br>"]
+}]
+[macro.return = Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+-- OBSOLETE!!!
+<!-- RollToParry
+[de.lib.DebugPickAttackerParry()]
+[de.lib.LookupParryID(LastParried)]
+[LastParriedType = macro.return]
+-- Convert non-weapons to "Fists" for easy table lookups without error
+[MainHandIsWeapon = de.lib.IsParryWeapon(MainHand)]
+[MainHandForParry = if(MainHandIsWeapon, MainHand, "Fist")]
+[WeaponType = de.lib.LookupWeaponStat(MainHandForParry, "Type")]
+[MainSkill = eval("Skill" + WeaponType)]
+[MainExpertise = json.contains(Expertise, MainHandForParry)]
+[MainToHitStat = de.lib.LookupWeaponStat(MainHandForParry, "ToHitStat")]
+[MainToHitStat = if (Dexterity > Strength && WeaponType == "Finesse", "Dexterity", MainToHitStat)]
+[MainToHitStat = if (StanceToHitStat == "", MainToHitStat, StanceToHitStat)]
+[MainStatBonus = de.lib.Mod(eval(MainToHitStat))]
+[MainParryMod = de.lib.LookupParryMod(MainHandForParry,LastParriedType)]
+[MainParryTotal = MainParryMod + MainSkill + MainStatBonus]
+[OffHandIsWeapon = de.lib.IsParryWeapon(OffHand)]
+[OffHandIsWeapon = if(matches(OffHand, ".*2H"), 0, OffHandIsWeapon)]
+[OffHandForParry = if(OffHandIsWeapon, OffHand, "Fist")]
+[WeaponType = de.lib.LookupWeaponStat(OffHandForParry, "Type")]
+[OffSkill = eval("Skill" + WeaponType)]
+[OffExpertise = json.contains(Expertise, OffHandForParry)]
+[OffToHitStat = de.lib.LookupWeaponStat(OffHandForParry, "ToHitStat")]
+[OffToHitStat = if (Dexterity > Strength && WeaponType == "Finesse", "Dexterity", OffToHitStat)]
+[OffToHitStat = if (StanceToHitStat == "", OffToHitStat, StanceToHitStat)]
+[OffStatBonus = de.lib.Mod(eval(OffToHitStat))]
+[OffParryMod = de.lib.LookupParryMod(OffHandForParry,LastParriedType)]
+[OffParryTotal = OffParryMod + OffSkill + OffStatBonus]
+
+[Roll = 2d10]
+[LifeMinus = de.lib.CurrentLifeMinus()]
+[if (OffHandForParry == "Fist" || MainParryTotal >= OffParryTotal), code: {
+    <!-- Main hand is used for parry -->
+    [OtherHandBonus = if (OffHandForParry == "Fist", 0, 1)]
+    [ParryRoll = Roll + MainParryMod + MainStatBonus + MainSkill + MainExpertise + LifeMinus + StanceParry + OtherHandBonus - ParriesThisRound]
+    
+    [Result = "Parrying with " + MainHand + ": <font color=green size=+2><b>" + ParryRoll + "</b></font><br>"]
+    [Result = Result + "( Roll "+ Roll]
+    [Result = Result + ", vs " + LastParried + ":" + MainParryMod + ", Stat used: " + MainToHitStat]
+    [Result = if(MainSkill != 0, Result + ", Skill " + MainSkill, Result)]
+    [Result = if(MainExpertise != 0, Result + ", Expertise " + MainExpertise, Result)]
+    [Result = if(LifeMinus != 0, Result + ", LifeMinus " + LifeMinus, Result)]
+    [Result = if(StanceParry != 0, Result + ", StanceBonus " + StanceParry, Result)]
+    [Result = if(OtherHandBonus != 0, Result + ", " + OffHand + ":" + OtherHandBonus, Result)]
+    [Result = if(ParriesThisRound != 0, Result + ", Parries This Round: -" + ParriesThisRound, Result)]
+    [Result = Result + " )<br>"]
+};
+{
+    <!-- Off hand is used for parry -->
+    [OtherHandBonus = if (MainHandForParry == "Fist", 0, 1)]
+    [ParryRoll = Roll + OffParryMod + OffStatBonus + OffSkill + OffExpertise + LifeMinus + StanceParry + OtherHandBonus - ParriesThisRound]
+    
+    [Result = "Parrying with " + OffHand + ": <font color=green size=+2><b>" + ParryRoll + "</b></font><br>"]
+    [Result = Result + "( Roll "+ Roll]
+    [Result = Result + ", vs " + LastParried + ":" + OffParryMod + ", Stat used: " + OffToHitStat]
+    [Result = if(OffStatBonus != 0, Result + ", Stat " + OffStatBonus, Result)]
+    [Result = if(OffSkill != 0, Result + ", Skill " + OffSkill, Result)]
+    [Result = if(OffExpertise != 0, Result + ", Expertise " + OffExpertise, Result)]
+    [Result = if(LifeMinus != 0, Result + ", LifeMinus " + LifeMinus, Result)]
+    [Result = if(StanceParry != 0, Result + ", StanceBonus " + StanceParry, Result)]
+    [Result = if(OtherHandBonus != 0, Result + ", " + MainHand + ":" + OtherHandBonus, Result)]
+    [Result = if(ParriesThisRound != 0, Result + ", Parries This Round: -" + ParriesThisRound, Result)]
+    [Result = Result + " )<br>"]
+}]
+[macro.return = Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
 <!-- Library: RollToHit OBSOLETE!!!!!
 [Weapon = arg(0)]
 [StaminaCost = arg(1)]

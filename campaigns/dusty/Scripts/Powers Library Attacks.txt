@@ -97,6 +97,8 @@
 -->
 [macro.return = Result]
 
+
+Holy vs WIL for each undead in burst. Hit: 1d10 + WIS Radiant damage (ignores armor), and targets are pushed 3 + WIS squares. Target is immobilized until makes WIS + 2 vs WIL.
 ------------------------------------------------------------------------------------------------------------------------
 
 <!-- Powers Library: CalculatedSlice

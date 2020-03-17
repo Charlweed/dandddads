@@ -1,3 +1,22 @@
+<!-- Powers Library: Blur
+[de.lib.TestOwnership()]
+[ThisStance = "Blur"]
+[assert(Stance != ThisStance, "<font color=red><b>Already in " + ThisStance + " stance.</b></font>")]
+[Result = de.lib.ExpendRAP(1,0)]
+[assert(Result == "Success", "<font color=red><b>" + Result + "</b></font>")]
+[de.lib.ExpendRAP(1,1)]
+[de.lib.ClearStanceScratchpad()]
+[Stance = ThisStance]
+[StanceDodge = 1]
+[StanceParry = 1]
+[StanceWill = 1]
+[StanceFort = 1]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
+[Result = Result + "+1 Defenses, -1 agro slot"]
+-->
+[macro.return = Result]
+------------------------------------------------------------------------------------------------------------------------
+
 <!-- Stances: Resting
 [de.lib.TestOwnership()]
 [ThisStance = "Resting"]
@@ -14,10 +33,12 @@
 [StanceDodge = -2]
 [StanceWill = -2]
 [StanceFort = -2]
-[Result = "Taking  <font: color = blue><b>[Stance]</b></font> stance.<br>
+[Stance = ThisStance]
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance.<br>
  -2 all defenses,  -2 To Hit, -2 Parry, -2 Parry DC.  If resting at start of turn, gain 1 focus and stamina."]
 -->
 [macro.return = Result]
+
 ------------------------------------------------------------------------------------------------------------------------
 
 <!-- Powers Library: Arcane Guidance
@@ -64,7 +85,6 @@
 [de.lib.ClearStanceScratchpad()]
 [Stance = ThisStance]
 [StanceToHitMelee = -2]
-[StanceParry = -2]
 [Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>"]
 [Result = Result + "-2 To Hit, +" + de.lib.Mod(Dexterity) + " to defenses against Opportunity Attacks."]
 -->
@@ -80,7 +100,7 @@
 [de.lib.ExpendRAP(1,1)]
 [de.lib.ClearStanceScratchpad()]
 [Stance = ThisStance]
-[Result = "Taking  <font: color = blue><b>[Stance]</b></font> stance. (1 RAP)<br>
+[Result = "Taking  <font: color = blue><b>" + Stance + "</b></font> stance. (1 RAP)<br>
 If Body Over Mind active at start of turn, exchange two focus for two stamina."]
 -->
 [macro.return = Result]

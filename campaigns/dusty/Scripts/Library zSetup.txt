@@ -1,3 +1,33 @@
+------------------------------------------------------------------------------------------------------------------------
+<!-- Library: AddExtras
+
+-- Build input form advanced
+[abort(input("junk|<html><b>Add a new extra property:</b><br></html>|-|LABEL|SPAN=TRUE","Property","Value"))]
+[if (Property == "" || Value == ""), code: {
+    [Result = "<font color=red><b>Both entries require input.</b><font>"]
+};{
+    [Extras = json.set(Extras, Property, Value)] 
+    [Result = "Extra Property " + Property + " is set to " + Value]
+}]
+[macro.return = Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Library: AddHoldable
+
+-- Build input form advanced
+[abort(input("junk|<html><b>Add a new object that can be held.:</b><br></html>|-|LABEL|SPAN=TRUE","Item"))]
+[if (Item == ""), code: {
+    [Result = "<font color=red><b>An object name is required.</b><font>"]
+};{
+    [Holdables = json.append(Holdables, Item)] 
+    [Result = "New object " + Item + " has been added to the holdable item list."]
+}]
+[macro.return = Result]
+-->
+
+------------------------------------------------------------------------------------------------------------------------
+
 <!-- Library: AssignArmor
 
 -- Get list of armor locations
@@ -74,20 +104,6 @@
 -->
 
 ------------------------------------------------------------------------------------------------------------------------
-<!-- Library: AddExtras
-
--- Build input form advanced
-[abort(input("junk|<html><b>Add a new extra property:</b><br></html>|-|LABEL|SPAN=TRUE","Property","Value"))]
-[if (Property == "" || Value == ""), code: {
-    [Result = "<font color=red><b>Both entries require input.</b><font>"]
-};{
-    [Extras = json.set(Extras, Property, Value)] 
-    [Result = "Extra Property " + Property + " is set to " + Value]
-}]
--->
-
-
-------------------------------------------------------------------------------------------------------------------------
 
 <!-- Library: Fill New Token
 [CarriedWeapons = if(json.isEmpty(CarriedWeapons), "[]", CarriedWeapons)]
@@ -100,34 +116,20 @@
 [CoreFatigue = if (CoreFatigue == "", Wisdom, CoreFatigue)]
 [CoreAura = if (CoreAura == "", Charisma, CoreAura)]
 [CoreRoundAP = if (CoreRoundAP == "", 8, CoreRoundAP)]
-[CoreAP = if (CoreAP == "", 5, CoreAP)]
-[CoreSpellAP = if (CoreSpellAP == "", 0, CoreSpellAP)]
+[CoreAP = if (CoreAP == "", 3, CoreAP)]
+[CoreSpellAP = if (CoreSpellAP == "", 2, CoreSpellAP)]
 [CoreLife = if (CoreLife == "", 10 + de.lib.Mod(Strength), CoreLife)]
 [MaxLife = CoreLife]
 [CurLife = MaxLife]
 [Extras = if (json.isEmpty(Extras), "{}", Extras)]
-[Holdables = if (json.isEmpty(Holdables), "{}", Holdables)]
--->
-
-------------------------------------------------------------------------------------------------------------------------
-<!-- Library: AddHoldable
-
--- Build input form advanced
-[abort(input("junk|<html><b>Add a new object that can be held.:</b><br></html>|-|LABEL|SPAN=TRUE","Item"))]
-[if (Item == ""), code: {
-    [Result = "<font color=red><b>An object name is required.</b><font>"]
-};{
-    [Holdables = json.append(Holdables, Item)] 
-    [Result = "New object " + Item + " has been added to the holdable item list."]
-}]
+[Holdables = if (json.isEmpty(Holdables), "[]", Holdables)]
 -->
 
 ------------------------------------------------------------------------------------------------------------------------
 <!-- Library: Clear Secondary Stats
 [CoreStamina = ""]
 [CoreFocus = ""]
-[CoreFatigue = ""]
-[CoreAura = ""]
+[CoreMojo = ""]
 [CoreRoundAP = ""]
 [CoreAP = ""]
 [CoreSpellAP = ""]
@@ -142,6 +144,25 @@
 [Sanity = ""]
 [Move = ""]
 [InitBonus = ""]
+-->
+------------------------------------------------------------------------------------------------------------------------
+<!-- Library: Fill New Token
+[CarriedWeapons = if(json.isEmpty(CarriedWeapons), "[]", CarriedWeapons)]
+[Expertise = if(json.isEmpty(Expertise), "[]", Expertise)]
+[Stance = "None"]
+[de.lib.ClearStanceScratchpad()]
+[LifeMinusStartsAt = if (LifeMinusStartsAt == "", 10, LifeMinusStartsAt)]
+[CoreStamina = if (CoreStamina == "", Constitution, CoreStamina)]
+[CoreFocus = if (CoreFocus == "", Intelligence, CoreFocus)]
+[CoreMojo = if (CoreMojo == "", Wisdom + Charisma, CoreMojo)]
+[CoreRoundAP = if (CoreRoundAP == "", 8, CoreRoundAP)]
+[CoreAP = if (CoreAP == "", 5, CoreAP)]
+[CoreSpellAP = if (CoreSpellAP == "", 0, CoreSpellAP)]
+[CoreLife = if (CoreLife == "", 10 + de.lib.Mod(Strength), CoreLife)]
+[MaxLife = CoreLife]
+[CurLife = MaxLife]
+[Extras = if (json.isEmpty(Extras), "{}", Extras)]
+[Holdables = if (json.isEmpty(Holdables), "[]", Holdables)]
 -->
 
 

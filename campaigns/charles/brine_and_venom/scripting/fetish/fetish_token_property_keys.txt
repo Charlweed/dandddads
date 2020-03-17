@@ -1,0 +1,6 @@
+#Creator
+*Label
+*Owner
+TargetTokenId
+#TargetItemType
+*Durability

@@ -102,7 +102,7 @@
 }]
 [Result = Result + ")<br>"]
 [Result = Result + "Damage: <font size=+2 color=red><b>" + Damage + "</b></font>"]
-[Result = Result + "<br>(Roll:" + DamageRoll + ", Elem:" + SkillVal]
+[Result = Result + "<br>(Roll:" + DamageRoll + " - 2, Elem:" + SkillVal]
 [if (FireDamage != 0), code: {
     [Result = Result + ", Fire:" + FireDamage]
 }]

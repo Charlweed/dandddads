@@ -5,8 +5,7 @@
 ---------------|Display|-----------------
 *#Stamina:{CurStamina} / {MaxStamina} ({TempStamina} temp)
 *#Focus:{CurFocus} / {MaxFocus} ({TempFocus} temp)
-*#Fatigue:{CurFatigue} / {MaxFatigue} ({TempFatigue} temp)
-*#Aura:{CurAura} / {MaxAura} ({TempAura} temp)
+*#Mojo:{CurMojo} / {MaxMojo} ({TempMojo} temp)
 *Life:{CurLife} / {MaxLife}
 *#Dodge
 *#Defenses:Reflex {Reflex}, Fort {Fortitude}, Will {Will}
@@ -22,8 +21,7 @@
 ---------------|Display|-----------------
 *Stamina:{CurStamina} / {MaxStamina} ({TempStamina} temp)
 *Focus:{CurFocus} / {MaxFocus} ({TempFocus} temp)
-*Fatigue:{CurFatigue} / {MaxFatigue} ({TempFatigue} temp)
-*Aura:{CurAura} / {MaxAura} ({TempAura} temp)
+*Mojo:{CurMojo} / {MaxMojo} ({TempMojo} temp)
 *Life:{CurLife} / {MaxLife}
 *Move
 *Dodge
@@ -32,7 +30,6 @@
 *Round APs:{CurRoundAP}/{MaxRoundAP}
 *Daily APs:{CurAP}/{MaxAP} Spell {CurSpellAP}/{MaxSpellAP}
 *Hero Points:{HeroPoints}
-
 --------------|Core Stats|----------------
 Strength
 Dexterity
@@ -44,6 +41,7 @@ CoreStamina
 CoreFocus
 CoreFatigue
 CoreAura
+CoreMojo
 CoreRoundAP
 CoreAP
 CoreSpellAP
@@ -56,6 +54,9 @@ TempStamina
 MaxFocus
 CurFocus
 TempFocus
+MaxMojo
+CurMojo
+TempMojo
 MaxFatigue
 CurFatigue
 TempFatigue
@@ -105,10 +106,10 @@ SkillBlack
 SkillWhite
 SkillMind
 SkillPlanes
-SkillMonster
 LifeMinusStartsAt
 Extras
 Holdables
+Wounds
 ----------------|Skills|-----------------
 Acrobatics
 Athletics

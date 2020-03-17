@@ -25,7 +25,7 @@
 [Sanity = if (Sanity == "", de.lib.Mod(Charisma), Sanity)]
 [Move = if (Move == "", 6, Move)]
 [InitBonus = if (InitBonus == "", de.lib.Mod(Dexterity), InitBonus)]
-[abort(input("junk|<html><b>Any changes to secondary stats? <br></html>|-|LABEL|SPAN=TRUE","CoreStamina|"+CoreStamina,"CoreFocus|"+CoreFocus,"CoreFatigue|"+CoreFatigue,"CoreAura|"+CoreAura,"CoreAP|"+CoreAP,"CoreSpellAP|"+CoreSpellAP,"CoreLife|"+CoreLife,"Dodge|"+Dodge,"Reflex|"+Reflex,"Fortitude|"+Fortitude,"Will|"+Will,"Bravery|"+Bravery,"Luck|"+Luck,"Sanity|"+Sanity,"InitBonus|"+InitBonus,"Move|"+Move))]
+[abort(input("junk|<html><b>Any changes to secondary stats? <br></html>|-|LABEL|SPAN=TRUE","CoreStamina|"+CoreStamina,"CoreFocus|"+CoreFocus,"CoreMojo|"+CoreMojo,"CoreAP|"+CoreAP,"CoreSpellAP|"+CoreSpellAP,"CoreLife|"+CoreLife,"Dodge|"+Dodge,"Reflex|"+Reflex,"Fortitude|"+Fortitude,"Will|"+Will,"Bravery|"+Bravery,"Luck|"+Luck,"Sanity|"+Sanity,"InitBonus|"+InitBonus,"Move|"+Move))]
 [Acrobatics = if( Acrobatics == "", 0, Acrobatics)]
 [Athletics = if( Athletics == "", 0, Athletics)]
 [Diplomacy = if( Diplomacy == "", 0, Diplomacy)]

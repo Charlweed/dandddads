@@ -118,3 +118,41 @@
 [Result = Result + "<br>Telepathically call out to a creature of animal intelligence within mantle miles."]
 -->
 [macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+
+<!-- Powers Library: Turn Undead
+[de.lib.TestOwnership()]
+[CostString = po.lib.VerifyRequirements(2,4,4,0,0)]
+
+-- Perform Power
+
+-- Output --
+[Result = "<b>Turn Undead</b>:" + CostString]
+[Result = Result + "<br>Roll <b>Turn Undead Individual Attack</b> against every undead in close burst 10."]
+-->
+[macro.return = Result]
+
+------------------------------------------------------------------------------------------------------------------------
+<!-- Powers Library: Turn Undead Individual Attack
+
+-- Perform Power
+[SkillVal = de.lib.LookupMagicSkill("SkillHoly")]
+[Roll = 2d10]
+[Attack = Roll + SkillVal - 2]
+
+-- Output --
+[Result = "<b>Turn Undead Individual</b>:<br>Attack: <font size=+2 color=green><b>" + Attack + "</b></font> vs <font size=+2 color=blue>WIL</font></b><br>(Roll:" + Roll + ", Holy:" + SkillVal + ", - 2)"]
+
+-- Damage
+[WisdomMod = de.lib.Mod(Wisdom)]
+[DamRoll = 1d10]
+[Damage = DamRoll + WisdomMod]
+[Push = WisdomMod + 3]
+
+-- Output --
+[Result = Result + "<br>If Hit, Damage: <font size=+2 color=red><b>" + Damage + "</b></font><br>(Roll:" + DamRoll + ", Wisdom:" + WisdomMod +" and target is pushed <b><font color=blue>" + Push + "</font></b> spaces.<br>Target is immobilized until makes WIL vs DC 12."]
+
+-->
+[macro.return = Result]
+

@@ -34,7 +34,7 @@ Acrobatics vs Opponent Attack for no OA when shifting diagonal.
 
 ------------------------------------------------------------------------------------------------------------------------
 
-<!-- Shift
+<!-- Move
 [de.lib.TestOwnership()]
 [de.lib.ExpendRAP(3,0)]
 [assert(macro.return == "Success", macro.return)]

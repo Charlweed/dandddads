@@ -1,0 +1,7 @@
+[h: targetTokenID = getProperty("targetTokenID")]
+[h: origList = getProperty("FetishIDs",targetTokenID)]
+[h: newFetishList = setStrProp(origList,currentToken(),getName())]
+[r: "origList = '" + origList + "'<br>"]
+[r: "newFetishList = '" + newFetishList  + "'<br>"]
+[h: setProperty("TargetTokenName", getName(targetTokenID))]
+[h: setProperty("FetishIDs", newFetishList, targetTokenID)]
